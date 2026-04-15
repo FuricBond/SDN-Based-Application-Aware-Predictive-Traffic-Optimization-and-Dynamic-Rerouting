@@ -9,10 +9,14 @@ venv/
 env/
 ENV/
 sdn-env/
+.env
 
 # Logs and runtime output
 logs/
 *.log
+*.tmp
+*.temp
+temp/
 
 # Test and tooling caches
 .pytest_cache/
