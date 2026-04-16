@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SDN Traffic Optimizer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-container": "#001d07",
+                      "on-surface": "#dae2fd",
+                      "surface-container": "#171f33",
+                      "on-surface-variant": "#c6c6cd",
+                      "outline": "#909097",
+                      "primary-fixed-dim": "#4ae176",
+                      "surface-variant": "#2d3449",
+                      "inverse-on-surface": "#283044",
+                      "on-secondary-fixed": "#131b2e",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "on-tertiary": "#68000a",
+                      "surface-bright": "#31394d",
+                      "on-primary-fixed": "#002109",
+                      "secondary-container": "#3f465c",
+                      "error": "#ffb4ab",
+                      "surface-dim": "#0b1326",
+                      "on-tertiary-fixed": "#410004",
+                      "surface-container-low": "#131b2e",
+                      "surface-container-high": "#222a3d",
+                      "on-primary": "#003915",
+                      "inverse-surface": "#dae2fd",
+                      "inverse-primary": "#006e2f",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#930013",
+                      "primary": "#4ae176",
+                      "outline-variant": "#45464d",
+                      "tertiary-fixed-dim": "#ffb3ad",
+                      "primary-fixed": "#6bff8f",
+                      "secondary": "#bec6e0",
+                      "secondary-fixed": "#dae2fd",
+                      "on-secondary-container": "#adb4ce",
+                      "error-container": "#93000a",
+                      "surface-container-lowest": "#060e20",
+                      "on-tertiary-container": "#eb4141",
+                      "tertiary-fixed": "#ffdad7",
+                      "surface": "#0b1326",
+                      "on-error": "#690005",
+                      "background": "#0b1326",
+                      "on-secondary": "#283044",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "surface-container-highest": "#2d3449",
+                      "tertiary-container": "#390003",
+                      "surface-tint": "#4ae176",
+                      "tertiary": "#ffb3ad",
+                      "on-background": "#dae2fd",
+                      "on-primary-fixed-variant": "#005321",
+                      "on-primary-container": "#009542"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Space Grotesk"]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .font-label { font-family: 'Space Grotesk', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(45, 52, 73, 0.6); backdrop-filter: blur(12px); }
+        .inner-glow { box-shadow: inset 0 1px 0 0 rgba(74, 225, 118, 0.1); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-slate-900/60 backdrop-blur-xl no-line separation via bg-slate-800/50 inner-glow shadow-[inset_0_1px_0_0_rgba(74,225,118,0.1)]">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-emerald-400 font-['Manrope']">SDN Traffic Optimizer</span>
+<div class="hidden md:flex gap-6">
+<a class="font-['Manrope'] tracking-tight text-emerald-400 border-b-2 border-emerald-400 pb-1 hover:text-emerald-300 transition-colors" href="#">Network Stats</a>
+<a class="font-['Manrope'] tracking-tight text-slate-400 hover:text-emerald-300 transition-colors" href="#">Global View</a>
+<a class="font-['Manrope'] tracking-tight text-slate-400 hover:text-emerald-300 transition-colors" href="#">Admin</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-slate-400 text-sm">search</span>
+<input class="bg-surface-container-lowest border-none rounded-lg pl-10 pr-4 py-1 text-sm focus:ring-1 focus:ring-primary w-64" placeholder="Search flows..." type="text"/>
+</div>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-primary transition-colors">settings</span>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-primary/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDD5qxgztGBW0Y7zq97MBDPJQMPI3UEY_4ukf7vnRfee7chuNNZ6FKzKtvvjTWY-C2plH4jRcNkvYAuLTWFl6WCFq_UvpPL4gcSIXsU2qQsEfu99y6WPk6agH-E1OyittUDjbfQ_HjU3D3qJ2GoML3QJTSY9yN8b8oO4EgxHTsvl-7E0_fD1eXth_0L-v1sGc1vmksrzm9K4jgBqK7A7kWpun7IxGDc-pw_51ncc44SaUEY7FiBaz0T4v4T3sjDXh9IEg_z5nSgNFGo"/>
+</div>
+</nav>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col py-6 border-r border-slate-800/50 bg-slate-950 rounded-r-2xl shadow-2xl shadow-black/50 z-40 mt-16">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">hub</span>
+</div>
+<div>
+<p class="font-bold text-emerald-400 font-['Inter'] text-sm">Neural Overlay</p>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-label">Active Instance</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-emerald-500/10 text-emerald-400 border-r-4 border-emerald-500 transition-all duration-300 ease-in-out font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 ease-in-out font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">hub</span>
+                Topology
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 ease-in-out font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">insights</span>
+                Optimization
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 ease-in-out font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">security</span>
+                Security
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 ease-in-out font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">router</span>
+                Hardware
+            </a>
+</nav>
+<div class="px-4 mt-auto space-y-4">
+<button class="w-full py-3 bg-primary text-on-primary font-bold rounded-xl text-sm hover:shadow-[0_0_15px_rgba(74,225,118,0.4)] transition-all">Deploy Config</button>
+<div class="space-y-1 border-t border-slate-800/50 pt-4">
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-200 text-xs font-label" href="#">
+<span class="material-symbols-outlined text-sm">terminal</span>
+                    System Logs
+                </a>
+<a class="flex items-center gap-3 px-4 py-2 text-slate-500 hover:text-slate-200 text-xs font-label" href="#">
+<span class="material-symbols-outlined text-sm">help_outline</span>
+                    Support
+                </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 pt-24 px-8 pb-8 min-h-screen">
+<!-- Header -->
+<header class="mb-10">
+<h1 class="text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">SDN Traffic Optimizer</h1>
+<p class="text-secondary font-medium">Live application-aware traffic monitoring and control.</p>
+</header>
+<!-- Top Row: Bento Cards -->
+<div class="grid grid-cols-12 gap-6 mb-6">
+<!-- Neural Engine Status -->
+<div class="col-span-12 lg:col-span-5 bg-surface-container rounded-[16px] p-6 inner-glow border border-white/5 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-4">
+<h3 class="font-headline font-bold text-lg text-on-surface">Neural Engine Status</h3>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div class="flex gap-4">
+<div class="flex-1 p-3 rounded-xl bg-primary-container border border-primary/20 flex flex-col items-center">
+<span class="text-[10px] uppercase font-label text-primary tracking-widest mb-1">NORMAL</span>
+<div class="h-1.5 w-full bg-primary rounded-full shadow-[0_0_8px_rgba(74,225,118,0.5)]"></div>
+</div>
+<div class="flex-1 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/10 flex flex-col items-center opacity-40">
+<span class="text-[10px] uppercase font-label text-tertiary tracking-widest mb-1">CONGESTED</span>
+<div class="h-1.5 w-full bg-slate-700 rounded-full"></div>
+</div>
+<div class="flex-1 p-3 rounded-xl bg-surface-container-lowest border border-outline-variant/10 flex flex-col items-center opacity-40">
+<span class="text-[10px] uppercase font-label text-on-surface tracking-widest mb-1">REROUTING</span>
+<div class="h-1.5 w-full bg-slate-700 rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-slate-800/50">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] font-label text-slate-500 uppercase">System Latency</p>
+<p class="text-2xl font-headline font-bold text-primary">0.42ms</p>
+</div>
+<div class="text-right">
+<p class="text-[10px] font-label text-slate-500 uppercase">Confidence Score</p>
+<p class="text-2xl font-headline font-bold text-on-surface">99.8%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Current Active Path -->
+<div class="col-span-12 lg:col-span-7 bg-surface-container rounded-[16px] p-6 inner-glow border border-white/5 overflow-hidden relative">
+<div class="flex justify-between items-start mb-6">
+<h3 class="font-headline font-bold text-lg text-on-surface">Current Active Path</h3>
+<div class="px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+<span class="text-[10px] font-label text-primary font-bold tracking-widest">REAL-TIME MAPPING</span>
+</div>
+</div>
+<div class="flex items-center justify-between px-4 py-8">
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-primary/40 flex items-center justify-center text-primary font-label font-bold text-lg shadow-[0_0_15px_rgba(74,225,118,0.2)]">h1</div>
+<span class="text-[10px] text-slate-500 font-label">Source</span>
+</div>
+<div class="flex-1 h-[2px] bg-gradient-to-r from-primary to-primary mx-2 relative">
+<div class="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(74,225,118,0.8)]"></div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface font-label font-bold text-lg">s1</div>
+<span class="text-[10px] text-slate-500 font-label">L3 Node</span>
+</div>
+<div class="flex-1 h-[2px] bg-slate-700 mx-2"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface font-label font-bold text-lg">s2</div>
+<span class="text-[10px] text-slate-500 font-label">Core</span>
+</div>
+<div class="flex-1 h-[2px] bg-slate-700 mx-2"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-on-surface font-label font-bold text-lg">s4</div>
+<span class="text-[10px] text-slate-500 font-label">Edge</span>
+</div>
+<div class="flex-1 h-[2px] bg-gradient-to-r from-slate-700 to-primary mx-2"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-primary/40 flex items-center justify-center text-primary font-label font-bold text-lg shadow-[0_0_15px_rgba(74,225,118,0.2)]">h2</div>
+<span class="text-[10px] text-slate-500 font-label">Target</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle Row: KPI Monitoring -->
+<div class="grid grid-cols-12 gap-6 mb-6">
+<!-- Congestion Status -->
+<div class="col-span-12 md:col-span-4 glass-panel rounded-[16px] p-6 inner-glow border border-white/5 h-48 flex flex-col justify-between">
+<div class="flex items-center gap-2 text-on-surface/70">
+<span class="material-symbols-outlined text-sm">show_chart</span>
+<h4 class="font-label text-xs font-bold tracking-widest uppercase">Congestion Status</h4>
+</div>
+<div>
+<p class="text-4xl font-headline font-extrabold text-on-surface">12.4<span class="text-lg font-medium text-slate-500">%</span></p>
+<p class="text-primary text-xs font-label mt-1">↓ 2.1% from last hour</p>
+</div>
+<div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[12.4%]"></div>
+</div>
+</div>
+<!-- Rerouting Events -->
+<div class="col-span-12 md:col-span-4 glass-panel rounded-[16px] p-6 inner-glow border border-white/5 h-48 flex flex-col justify-between">
+<div class="flex items-center gap-2 text-on-surface/70">
+<span class="material-symbols-outlined text-sm">swap_calls</span>
+<h4 class="font-label text-xs font-bold tracking-widest uppercase">Rerouting Events</h4>
+</div>
+<div>
+<p class="text-4xl font-headline font-extrabold text-on-surface">08</p>
+<p class="text-slate-500 text-xs font-label mt-1">Last event 4m ago</p>
+</div>
+<div class="flex gap-1 h-8 items-end">
+<div class="w-2 bg-primary/20 h-4 rounded-t-sm"></div>
+<div class="w-2 bg-primary/20 h-6 rounded-t-sm"></div>
+<div class="w-2 bg-primary/60 h-8 rounded-t-sm"></div>
+<div class="w-2 bg-primary/20 h-3 rounded-t-sm"></div>
+<div class="w-2 bg-primary/40 h-5 rounded-t-sm"></div>
+<div class="w-2 bg-primary h-7 rounded-t-sm"></div>
+</div>
+</div>
+<!-- Flow Statistics -->
+<div class="col-span-12 md:col-span-4 glass-panel rounded-[16px] p-6 inner-glow border border-white/5 h-48 flex flex-col justify-between">
+<div class="flex items-center gap-2 text-on-surface/70">
+<span class="material-symbols-outlined text-sm">database</span>
+<h4 class="font-label text-xs font-bold tracking-widest uppercase">Flow Statistics</h4>
+</div>
+<div>
+<p class="text-4xl font-headline font-extrabold text-on-surface">8.2<span class="text-lg font-medium text-slate-500"> Gbps</span></p>
+<p class="text-slate-500 text-xs font-label mt-1">Avg payload 1.4KB</p>
+</div>
+<div class="flex justify-between items-center text-[10px] font-label text-slate-500">
+<span>TCP: 65%</span>
+<span>UDP: 30%</span>
+<span>ICMP: 5%</span>
+</div>
+</div>
+</div>
+<!-- Bottom Row: System Kernel Logs -->
+<div class="bg-surface-container-lowest rounded-[16px] border border-outline-variant/20 overflow-hidden shadow-2xl">
+<div class="bg-surface-container-high px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-on-tertiary-container/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary/40"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed-dim/40"></div>
+</div>
+<span class="font-label text-xs font-bold text-slate-400 ml-2">SYSTEM KERNEL LOGS</span>
+</div>
+<div class="flex items-center gap-4 text-slate-500">
+<span class="text-[10px] font-label">TTY: pts/0</span>
+<span class="material-symbols-outlined text-sm cursor-pointer">download</span>
+<span class="material-symbols-outlined text-sm cursor-pointer">close</span>
+</div>
+</div>
+<div class="p-6 h-64 overflow-y-auto font-mono text-sm leading-relaxed text-emerald-400/80 bg-black/40 backdrop-blur-md">
+<div class="flex gap-4">
+<span class="text-slate-600 shrink-0">[14:20:01]</span>
+<span><span class="text-blue-400 font-bold">INFO:</span> Initializing Neural Pathfinding Engine... OK</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 shrink-0">[14:20:05]</span>
+<span><span class="text-blue-400 font-bold">INFO:</span> Topology mapped. 4 nodes detected in path h1 -&gt; h2.</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 shrink-0">[14:21:44]</span>
+<span><span class="text-yellow-400 font-bold">WARN:</span> Node s2 reporting high buffer utilization (78%).</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 shrink-0">[14:22:10]</span>
+<span><span class="text-primary font-bold">EXEC:</span> Rerouting algorithm triggered via SDN controller.</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 shrink-0">[14:22:11]</span>
+<span><span class="text-primary font-bold">SUCCESS:</span> Optimized flow active. Latency decreased by 14ms.</span>
+</div>
+<div class="flex gap-4">
+<span class="text-slate-600 shrink-0">[14:25:00]</span>
+<span><span class="text-blue-400 font-bold">INFO:</span> Pulse check: All instances operational.</span>
+</div>
+<div class="flex gap-4 animate-pulse">
+<span class="text-slate-600 shrink-0">[14:25:32]</span>
+<span><span class="text-primary font-bold">_</span></span>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB (Hidden on this dashboard as per suppression rules) -->
+</body></html>

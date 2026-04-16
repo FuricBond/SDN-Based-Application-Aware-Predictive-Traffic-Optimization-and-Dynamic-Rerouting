@@ -1,0 +1,214 @@
+<!-- page: optimization -->
+<!-- Route: /optimization | Title: Optimization Engine — SDN Traffic Optimizer -->
+<div class="page" id="page-optimization">
+  <header class="flex justify-between items-center mb-10">
+    <div>
+      <h1 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">Optimization Engine</h1>
+      <p class="text-on-surface-variant font-body mt-1">Real-time decision-making and performance tuning.</p>
+    </div>
+    <button class="btn-primary flex items-center gap-2 text-sm glow-primary">
+      <span class="material-symbols-outlined text-sm">bolt</span>Deploy Config
+    </button>
+  </header>
+
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Optimization Status -->
+    <section class="col-span-12 lg:col-span-4 glass-panel p-6 rounded-xl overflow-hidden relative">
+      <div class="absolute top-0 right-0 p-4 opacity-10">
+        <span class="material-symbols-outlined text-6xl">settings_suggest</span>
+      </div>
+      <h3 class="font-label text-xs uppercase tracking-widest text-primary mb-6">Optimization Status</h3>
+      <div class="space-y-6">
+        <div class="flex justify-between items-end">
+          <div>
+            <p class="text-on-surface-variant text-sm mb-1">Current Mode</p>
+            <p class="text-2xl font-headline font-bold text-on-surface">PREDICTIVE_AUTO</p>
+          </div>
+          <span class="badge-active px-3 py-1 rounded-full text-[10px] font-bold tracking-tighter font-label">ACTIVE</span>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="solid-card p-4 rounded-xl">
+            <p class="text-on-surface-variant text-xs mb-1 font-body">Strategy</p>
+            <p class="text-sm font-label font-medium">Latency Prioritized</p>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <p class="text-on-surface-variant text-xs mb-1 font-body">Cooldown</p>
+            <p class="text-sm font-label font-medium">120s (Standby)</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Path Optimization Result -->
+    <section class="col-span-12 lg:col-span-8 glass-panel p-6 rounded-xl">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-label text-xs uppercase tracking-widest text-primary">Path Optimization Result</h3>
+        <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+          <span class="material-symbols-outlined text-xs text-primary">update</span>
+          Last compute: 14ms ago
+        </div>
+      </div>
+      <div class="flex items-center justify-between gap-8 h-32">
+        <div class="flex-1 flex flex-col items-center justify-center p-4 rounded-xl" style="background:rgba(6,14,32,0.3)">
+          <p class="text-[10px] uppercase font-label mb-2" style="color:#eb4141">Old Vector</p>
+          <div class="flex items-center gap-3">
+            <span class="text-lg font-label text-on-surface-variant">AS_64512</span>
+            <span class="material-symbols-outlined" style="color:#eb4141">trending_down</span>
+            <span class="text-lg font-label text-on-surface-variant">AS_64520</span>
+          </div>
+          <p class="mt-2 text-xs font-mono" style="color:#eb4141">42ms latency</p>
+        </div>
+        <div class="flex flex-col items-center text-primary">
+          <span class="material-symbols-outlined text-3xl">arrow_forward_ios</span>
+          <p class="text-[10px] font-bold mt-1">RE-ROUTE</p>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border glow-primary" style="background:rgba(74,225,118,0.1);border-color:rgba(74,225,118,0.2)">
+          <p class="text-[10px] uppercase font-label text-primary mb-2">Optimized Vector</p>
+          <div class="flex items-center gap-3">
+            <span class="text-lg font-label text-on-surface">AS_64512</span>
+            <span class="material-symbols-outlined text-primary">trending_up</span>
+            <span class="text-lg font-label text-on-surface">AS_64530</span>
+          </div>
+          <p class="mt-2 text-xs font-mono text-primary">18ms latency</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Link Load Trend Chart -->
+    <section class="col-span-12 lg:col-span-7 rounded-xl p-6" style="background:#131b2e">
+      <div class="flex justify-between items-center mb-8">
+        <h3 class="font-label text-xs uppercase tracking-widest text-secondary">Link Load Trend</h3>
+        <div class="flex gap-4">
+          <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-primary"></div><span class="text-[10px] text-on-surface-variant">Active Load</span></div>
+          <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-secondary-container"></div><span class="text-[10px] text-on-surface-variant">Buffer</span></div>
+        </div>
+      </div>
+      <div class="flex items-end justify-between h-48 gap-3 pb-8">
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl transition-all" style="background:rgba(74,225,118,0.4);height:65%"></div>
+          <span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-24px;left:50%;transform:translateX(-50%)">08:00</span>
+        </div>
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:45%"></div>
+          <span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-24px;left:50%;transform:translateX(-50%)">09:00</span>
+        </div>
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:85%"></div>
+          <span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-24px;left:50%;transform:translateX(-50%)">10:00</span>
+        </div>
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:72%"></div>
+          <span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-24px;left:50%;transform:translateX(-50%)">11:00</span>
+        </div>
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl bg-primary" style="height:92%"></div>
+          <span class="absolute text-[9px] font-label text-primary font-bold" style="bottom:-24px;left:50%;transform:translateX(-50%)">12:00</span>
+        </div>
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:55%"></div>
+          <span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-24px;left:50%;transform:translateX(-50%)">13:00</span>
+        </div>
+        <div class="w-full rounded-t-xl relative group chart-bar" style="background:rgba(63,70,92,0.2)">
+          <div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:30%"></div>
+          <span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-24px;left:50%;transform:translateX(-50%)">14:00</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Controller Decision -->
+    <section class="col-span-12 lg:col-span-5 rounded-xl p-6 border" style="background:#171f33;border-color:rgba(74,225,118,0.05)">
+      <h3 class="font-label text-xs uppercase tracking-widest text-primary mb-6">Controller Decision</h3>
+      <div class="space-y-4">
+        <div class="p-4 rounded-xl" style="background:#060e20;border-left:4px solid #4ae176">
+          <p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Primary Reason</p>
+          <p class="text-sm font-medium">Congestion at Edge Node 04 exceeds threshold (85%).</p>
+        </div>
+        <div class="solid-card p-4 rounded-xl">
+          <p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Action Executed</p>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-sm">swap_horiz</span>
+            <p class="text-sm font-medium">Re-balance flow 8821 to backup fiber.</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-6">
+          <div class="flex flex-col">
+            <span class="text-[10px] text-on-surface-variant font-label uppercase">Confidence</span>
+            <span class="text-2xl font-headline font-extrabold text-primary" data-bind="confidence-score" data-unit="pct">98.4%</span>
+          </div>
+          <div class="w-24 h-1 rounded-full overflow-hidden" style="background:#2d3449">
+            <div class="h-full bg-primary" style="width:98%;box-shadow:0 0 8px rgba(74,225,118,0.5)"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Optimization Logs -->
+    <section class="col-span-12 lg:col-span-8 rounded-xl p-6" style="background:#060e20">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-label text-xs uppercase tracking-widest text-secondary">Optimization Logs</h3>
+        <button class="text-[10px] text-primary hover:underline font-label uppercase">Export CSV</button>
+      </div>
+      <div class="space-y-2 overflow-y-auto max-h-48 pr-2">
+        <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant hover:bg-surface-container transition-colors" style="background:rgba(23,31,51,0.4)">
+          <span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:44:02]</span>
+          <span class="flex-1">Link integrity check passed: Node_FR_02</span>
+          <span class="text-[10px] text-slate-500">STATUS_OK</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant hover:bg-surface-container transition-colors" style="background:rgba(23,31,51,0.4)">
+          <span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:43:55]</span>
+          <span class="flex-1">Triggering predictive reroute for high-demand flow ID:9920</span>
+          <span class="text-[10px] text-primary font-bold">EXECUTING</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant hover:bg-surface-container transition-colors" style="background:rgba(23,31,51,0.4)">
+          <span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:42:10]</span>
+          <span class="flex-1">ML Model updated: v2.4.1 weights initialized</span>
+          <span class="text-[10px] text-slate-500">SYS_UPDATE</span>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs hover:bg-surface-container transition-colors" style="background:rgba(57,0,3,0.2);color:#eb4141">
+          <span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(235,65,65,0.6)">[12:40:01]</span>
+          <span class="flex-1">Packet loss anomaly detected at Core_SW_01 (0.04%)</span>
+          <span class="text-[10px] font-bold">WARNING</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Control Toggles -->
+    <section class="col-span-12 lg:col-span-4 glass-panel p-6 rounded-xl">
+      <h3 class="font-label text-xs uppercase tracking-widest text-primary mb-6">Control Toggles</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">auto_awesome</span>
+            <span class="text-sm font-medium">Predictive Routing</span>
+          </div>
+          <label class="toggle-wrapper">
+            <input type="checkbox" checked id="toggle-predictive">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-on-surface-variant">energy_savings_leaf</span>
+            <span class="text-sm font-medium">Eco-Node Standby</span>
+          </div>
+          <label class="toggle-wrapper">
+            <input type="checkbox" id="toggle-eco">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-on-surface-variant">shield_with_heart</span>
+            <span class="text-sm font-medium">Failover Loopback</span>
+          </div>
+          <label class="toggle-wrapper">
+            <input type="checkbox" checked id="toggle-failover">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div><!-- /page-optimization -->

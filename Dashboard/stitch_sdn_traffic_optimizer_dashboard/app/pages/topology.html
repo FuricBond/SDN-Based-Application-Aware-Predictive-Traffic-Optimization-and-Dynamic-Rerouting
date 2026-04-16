@@ -1,0 +1,256 @@
+<!-- page: topology -->
+<!-- Route: /topology | Title: Network Topology — SDN Traffic Optimizer -->
+<div class="page" id="page-topology">
+  <!-- Page Header -->
+  <header class="mb-8">
+    <h1 class="font-headline text-4xl font-extrabold text-on-surface tracking-tight mb-2">Network Topology</h1>
+    <p class="font-body text-secondary opacity-70">Real-time visualization of SDN fabric and routing paths.</p>
+  </header>
+
+  <!-- Bento Grid -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Live Topology Canvas (8/12 cols) -->
+    <section class="col-span-12 lg:col-span-8 glass-panel rounded-xl relative overflow-hidden flex flex-col" style="height:500px">
+      <!-- Canvas badge -->
+      <div class="absolute top-4 left-6 z-10 flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-md border"
+           style="background:rgba(6,14,32,0.8);border-color:rgba(69,70,77,0.1)">
+        <div class="w-2 h-2 rounded-full bg-primary pulse-dot"></div>
+        <span class="font-label text-xs tracking-wider uppercase">Live Topology Canvas</span>
+      </div>
+
+      <!-- Topology SVG — PRESERVED EXACTLY, only colors/glow updated -->
+      <div class="relative flex-1 flex items-center justify-center">
+        <svg class="w-full h-full p-12 overflow-visible" viewBox="0 0 800 400">
+          <!-- CONNECTING LINES — colors use CSS variables -->
+          <path class="neon-pulse" d="M100 200 L300 100"
+                stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
+          <path class="error-pulse" d="M100 200 L300 300"
+                stroke="var(--node-critical)" stroke-width="4"/>
+          <path class="neon-pulse" d="M300 100 L500 100"
+                stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
+          <path d="M300 300 L500 300"
+                stroke="var(--node-standby)" stroke-width="2"/>
+          <path class="neon-pulse" d="M500 100 L700 200"
+                stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
+          <path d="M500 300 L700 200"
+                stroke="var(--node-standby)" stroke-width="2"/>
+
+          <!-- NODES — PRESERVED structure & coordinates -->
+          <g transform="translate(100, 200)">
+            <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+            <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">EDGE_01</text>
+          </g>
+          <g transform="translate(300, 100)">
+            <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+            <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">CORE_A</text>
+          </g>
+          <g transform="translate(300, 300)">
+            <circle class="error-pulse" fill="var(--tertiary-container)" r="24" stroke="var(--node-critical)" stroke-width="2"/>
+            <text dy=".3em" fill="var(--node-critical)" font-family="Space Grotesk" font-size="10" text-anchor="middle">CORE_B</text>
+          </g>
+          <g transform="translate(500, 100)">
+            <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+            <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">DISTR_1</text>
+          </g>
+          <g transform="translate(500, 300)">
+            <circle fill="var(--surface-base)" r="24" stroke="var(--node-standby)" stroke-width="2"/>
+            <text dy=".3em" fill="var(--outline)" font-family="Space Grotesk" font-size="10" text-anchor="middle">DISTR_2</text>
+          </g>
+          <g transform="translate(700, 200)">
+            <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+            <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">END_04</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Legend -->
+      <div class="p-6 flex gap-6" style="background:rgba(15,23,42,0.4);border-top:1px solid rgba(69,70,77,0.1)">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-sm bg-primary"></div>
+          <span class="text-xs font-label text-slate-400">Active Path</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-sm" style="background:#eb4141"></div>
+          <span class="text-xs font-label text-slate-400">Congested Link</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-sm" style="background:#45464d"></div>
+          <span class="text-xs font-label text-slate-400">Standby</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Node Info Panel (4/12 cols) -->
+    <section class="col-span-12 lg:col-span-4 glass-panel rounded-xl p-6 flex flex-col">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="font-headline font-bold text-xl">Node Info</h2>
+        <span class="material-symbols-outlined text-primary">info</span>
+      </div>
+      <div class="space-y-4 flex-1">
+        <div class="solid-card p-4 rounded-xl">
+          <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Hostname</div>
+          <div class="font-headline text-lg font-bold text-on-surface">CORE-AS-091</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Status</div>
+            <div class="flex items-center gap-2 text-primary font-bold">
+              <span class="w-2 h-2 rounded-full bg-primary"></span>Healthy
+            </div>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Latency</div>
+            <div class="text-on-surface font-bold font-label">0.42 ms</div>
+          </div>
+        </div>
+        <div class="solid-card p-4 rounded-xl">
+          <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-2">Interfaces</div>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400 font-label">eth0 (100G)</span>
+              <span class="text-primary">82% Load</span>
+            </div>
+            <div class="w-full rounded-full h-1" style="background:#171f33">
+              <div class="bg-primary h-1 rounded-full" style="width:82%"></div>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400 font-label">eth1 (100G)</span>
+              <span style="color:#eb4141">Critical Load</span>
+            </div>
+            <div class="w-full rounded-full h-1" style="background:#171f33">
+              <div class="h-1 rounded-full" style="width:96%;background:#eb4141"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-ghost w-full mt-6 text-sm flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-sm">settings_ethernet</span>
+        Interface Config
+      </button>
+    </section>
+
+    <!-- Path Selection Logic -->
+    <section class="col-span-12 md:col-span-6 glass-panel rounded-xl p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 rounded-xl" style="background:rgba(74,225,118,0.1)">
+          <span class="material-symbols-outlined text-primary">route</span>
+        </div>
+        <h2 class="font-headline font-bold text-xl">Path Selection Logic</h2>
+      </div>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 rounded-xl border" style="background:#001d07;border-color:rgba(74,225,118,0.2)">
+          <div>
+            <div class="font-bold" style="color:#009542">Lowest Latency (Active)</div>
+            <div class="text-xs text-primary">Routing via Core-A and Distr-1</div>
+          </div>
+          <span class="material-symbols-outlined text-primary">check_circle</span>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-xl border solid-card hover:border-outline-variant transition-colors cursor-pointer">
+          <div>
+            <div class="font-bold text-slate-300">Cost-Optimized</div>
+            <div class="text-xs text-slate-500">Secondary routes with peering partners</div>
+          </div>
+          <span class="material-symbols-outlined text-slate-600">radio_button_unchecked</span>
+        </div>
+        <div class="flex items-center justify-between p-4 rounded-xl border solid-card hover:border-outline-variant transition-colors cursor-pointer">
+          <div>
+            <div class="font-bold text-slate-300">Resilient High-Availability</div>
+            <div class="text-xs text-slate-500">Active-Active redundancy multi-hop</div>
+          </div>
+          <span class="material-symbols-outlined text-slate-600">radio_button_unchecked</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Affected Node Metrics -->
+    <section class="col-span-12 md:col-span-6 glass-panel rounded-xl p-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-2 rounded-xl" style="background:rgba(235,65,65,0.1)">
+          <span class="material-symbols-outlined" style="color:#eb4141">warning</span>
+        </div>
+        <h2 class="font-headline font-bold text-xl">Affected Node Metrics</h2>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl border" style="background:rgba(57,0,3,0.2);border-color:rgba(235,65,65,0.2)">
+          <div class="text-[10px] font-label uppercase tracking-widest mb-1" style="color:#eb4141">Packet Loss</div>
+          <div class="text-3xl font-headline font-extrabold" style="color:#eb4141">4.2%</div>
+          <div class="text-xs text-slate-500 mt-1">CORE_B Instance</div>
+        </div>
+        <div class="solid-card p-4 rounded-xl">
+          <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">CPU Load</div>
+          <div class="text-3xl font-headline font-extrabold text-on-surface">94%</div>
+          <div class="text-xs text-slate-400 mt-1">CORE_B Process</div>
+        </div>
+        <div class="solid-card p-4 rounded-xl">
+          <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Queue Depth</div>
+          <div class="text-3xl font-headline font-extrabold text-on-surface">1.2k</div>
+          <div class="text-xs text-slate-400 mt-1">Pending Packets</div>
+        </div>
+        <div class="solid-card p-4 rounded-xl">
+          <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Uptime</div>
+          <div class="text-3xl font-headline font-extrabold text-on-surface">99.1%</div>
+          <div class="text-xs text-slate-400 mt-1">Degraded State</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Topology Event Logs -->
+    <section class="col-span-12 glass-panel rounded-xl p-6">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-secondary">terminal</span>
+          <h2 class="font-headline font-bold text-xl">Topology Event Logs</h2>
+        </div>
+        <div class="flex gap-2">
+          <span class="px-3 py-1 rounded-full text-[10px] font-label text-slate-400 border uppercase" style="background:#171f33;border-color:rgba(69,70,77,0.1)">All Events</span>
+          <span class="px-3 py-1 rounded-full text-[10px] font-label border uppercase cursor-pointer" style="background:rgba(235,65,65,0.1);color:#eb4141;border-color:rgba(235,65,65,0.2)">Critical Only</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm font-label">
+          <thead>
+            <tr class="text-slate-500 text-left" style="border-bottom:1px solid rgba(69,70,77,0.1)">
+              <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Timestamp</th>
+              <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Event Type</th>
+              <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Source Node</th>
+              <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Message</th>
+              <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(69,70,77,0.05)">
+              <td class="py-4 text-slate-400">14:22:01.092</td>
+              <td class="py-4">Path Re-Route</td>
+              <td class="py-4">CONTROLLER_01</td>
+              <td class="py-4 text-on-surface">Automatic switchover due to CORE_B congestion</td>
+              <td class="py-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-active">RESOLVED</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(69,70,77,0.05)">
+              <td class="py-4 text-slate-400">14:21:45.321</td>
+              <td class="py-4">Link Alert</td>
+              <td class="py-4">CORE_B</td>
+              <td class="py-4" style="color:#eb4141">Packet loss exceeding 3.5% threshold</td>
+              <td class="py-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-critical">ONGOING</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid rgba(69,70,77,0.05)">
+              <td class="py-4 text-slate-400">14:18:22.115</td>
+              <td class="py-4">Node Discovery</td>
+              <td class="py-4">DISTR_2</td>
+              <td class="py-4 text-on-surface">New endpoint detected via adjacency hello</td>
+              <td class="py-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background:#1e293b;color:#94a3b8">INFO</span></td>
+            </tr>
+            <tr>
+              <td class="py-4 text-slate-400">14:15:01.992</td>
+              <td class="py-4">Protocol Auth</td>
+              <td class="py-4">EDGE_01</td>
+              <td class="py-4 text-on-surface">BGP session established with provider peer</td>
+              <td class="py-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold badge-active">STABLE</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</div><!-- /page-topology -->

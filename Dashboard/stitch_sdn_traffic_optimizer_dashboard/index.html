@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="SDN Traffic Optimizer — Unified network control interface with real-time topology, optimization, security, and hardware monitoring."/>
+  <meta name="theme-color" content="#0b1326"/>
+  <title>SDN Traffic Optimizer — Neural Overlay</title>
+
+  <!-- TailwindCSS (Zero-Framework rule: Tailwind CDN only) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <!-- Google Fonts: Tri-Font System -->
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind Config — Design DNA -->
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary-container":          "#001d07",
+            "on-surface":                 "#dae2fd",
+            "surface-container":          "#171f33",
+            "on-surface-variant":         "#c6c6cd",
+            "outline":                    "#909097",
+            "primary-fixed-dim":          "#4ae176",
+            "surface-variant":            "#2d3449",
+            "inverse-on-surface":         "#283044",
+            "on-secondary-fixed":         "#131b2e",
+            "secondary-fixed-dim":        "#bec6e0",
+            "on-tertiary":                "#68000a",
+            "surface-bright":             "#31394d",
+            "on-primary-fixed":           "#002109",
+            "secondary-container":        "#3f465c",
+            "error":                      "#ffb4ab",
+            "surface-dim":                "#0b1326",
+            "on-tertiary-fixed":          "#410004",
+            "surface-container-low":      "#131b2e",
+            "surface-container-high":     "#222a3d",
+            "on-primary":                 "#003915",
+            "inverse-surface":            "#dae2fd",
+            "inverse-primary":            "#006e2f",
+            "on-error-container":         "#ffdad6",
+            "on-tertiary-fixed-variant":  "#930013",
+            "primary":                    "#4ae176",
+            "outline-variant":            "#45464d",
+            "tertiary-fixed-dim":         "#ffb3ad",
+            "primary-fixed":              "#6bff8f",
+            "secondary":                  "#bec6e0",
+            "secondary-fixed":            "#dae2fd",
+            "on-secondary-container":     "#adb4ce",
+            "error-container":            "#93000a",
+            "surface-container-lowest":   "#060e20",
+            "on-tertiary-container":      "#eb4141",
+            "tertiary-fixed":             "#ffdad7",
+            "surface":                    "#0b1326",
+            "on-error":                   "#690005",
+            "background":                 "#0b1326",
+            "on-secondary":               "#283044",
+            "on-secondary-fixed-variant": "#3f465c",
+            "surface-container-highest":  "#2d3449",
+            "tertiary-container":         "#390003",
+            "surface-tint":               "#4ae176",
+            "tertiary":                   "#ffb3ad",
+            "on-background":              "#dae2fd",
+            "on-primary-fixed-variant":   "#005321",
+            "on-primary-container":       "#009542"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg":      "0.5rem",
+            "xl":      "0.75rem",   /* ← STRICT: use rounded-xl for all containers */
+            "full":    "9999px"
+          },
+          fontFamily: {
+            "headline": ["Manrope"],
+            "body":     ["Inter"],
+            "label":    ["Space Grotesk"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="app/styles.css"/>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen">
+
+<!-- =====================================================
+  TOP NAVBAR (Fixed, h-16)
+  Design: Glassmorphism, inner-glow bottom border
+  ===================================================== -->
+<header id="app-navbar">
+  <div class="flex items-center gap-3">
+    <!-- Mobile menu toggle -->
+    <button id="sidebar-toggle"
+            class="md:hidden p-2 rounded-xl transition-colors"
+            style="color:#64748b"
+            aria-label="Toggle sidebar">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+
+    <!-- Brand -->
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-xl flex items-center justify-center"
+           style="background:rgba(74,225,118,0.12);border:1px solid rgba(74,225,118,0.2)">
+        <span class="material-symbols-outlined text-primary text-sm"
+              style="font-variation-settings:'FILL' 1;font-size:16px">hub</span>
+      </div>
+      <span class="text-lg font-bold tracking-tighter text-primary font-headline hidden sm:block">SDN Traffic Optimizer</span>
+    </div>
+
+    <!-- Desktop nav links -->
+    <nav class="hidden md:flex items-center gap-6 ml-6">
+      <a href="#" class="text-sm font-headline tracking-tight text-slate-400 hover:text-primary transition-colors">Network Stats</a>
+      <a href="#" class="text-sm font-headline tracking-tight text-slate-400 hover:text-primary transition-colors">Global View</a>
+      <a href="#" class="text-sm font-headline tracking-tight text-slate-400 hover:text-primary transition-colors">Admin</a>
+    </nav>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <!-- Search (desktop) -->
+    <div class="hidden lg:flex relative items-center">
+      <span class="material-symbols-outlined absolute left-3 text-slate-400"
+            style="font-size:16px">search</span>
+      <input type="text" placeholder="Search flows, nodes..."
+             class="rounded-xl pl-10 pr-4 py-1.5 text-sm font-label focus:outline-none w-52 transition-all"
+             style="background:#060e20;color:#dae2fd;border:1px solid rgba(69,70,77,0.2);"
+             onfocus="this.style.boxShadow='0 0 0 2px rgba(74,225,118,0.3)'"
+             onblur="this.style.boxShadow='none'"/>
+    </div>
+
+    <!-- Alerts indicator -->
+    <div class="relative">
+      <button class="material-symbols-outlined p-2 rounded-xl transition-colors"
+              style="color:#64748b;font-size:20px"
+              onmouseover="this.style.color='#4ae176'"
+              onmouseout="this.style.color='#64748b'">notifications</button>
+      <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+            style="background:#eb4141;box-shadow:0 0 6px rgba(235,65,65,0.6)"></span>
+    </div>
+
+    <button class="material-symbols-outlined p-2 rounded-xl transition-colors"
+            style="color:#64748b;font-size:20px"
+            onmouseover="this.style.color='#4ae176'"
+            onmouseout="this.style.color='#64748b'">settings</button>
+
+    <!-- Avatar -->
+    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs font-label border text-primary"
+         style="background:rgba(74,225,118,0.08);border-color:rgba(74,225,118,0.2)">AD</div>
+  </div>
+</header>
+
+
+<!-- =====================================================
+  SIDEBAR (Fixed Left, w-64)
+  Design: Dark glass, neural glow brand block
+  ===================================================== -->
+<aside id="app-sidebar">
+
+  <!-- Brand Block -->
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center"
+           style="background:rgba(74,225,118,0.08);border:1px solid rgba(74,225,118,0.15)">
+        <span class="material-symbols-outlined text-primary"
+              style="font-variation-settings:'FILL' 1">hub</span>
+      </div>
+      <div>
+        <p class="font-bold text-primary font-headline text-sm leading-tight">Neural Overlay</p>
+        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-label">Active Instance</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- System Health Pulse -->
+  <div class="mx-4 mb-6 p-3 rounded-xl flex items-center gap-3"
+       style="background:rgba(74,225,118,0.05);border:1px solid rgba(74,225,118,0.08)">
+    <div class="w-2 h-2 rounded-full bg-primary pulse-dot"
+         style="box-shadow:0 0 6px rgba(74,225,118,0.6)"></div>
+    <div>
+      <p class="text-[10px] font-label text-primary font-bold uppercase tracking-wider">All Systems Normal</p>
+      <p class="text-[9px] font-label text-slate-500 mt-0.5">Controller: Responsive</p>
+    </div>
+  </div>
+
+  <!-- Navigation Items -->
+  <nav class="flex-1 space-y-0.5" id="sidebar-nav">
+    <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+      <span class="material-symbols-outlined" style="font-size:20px">dashboard</span>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item" data-page="topology" id="nav-topology">
+      <span class="material-symbols-outlined" style="font-size:20px">hub</span>
+      Topology
+    </a>
+    <a href="#" class="nav-item" data-page="optimization" id="nav-optimization">
+      <span class="material-symbols-outlined" style="font-size:20px">insights</span>
+      Optimization
+    </a>
+    <a href="#" class="nav-item" data-page="security" id="nav-security">
+      <span class="material-symbols-outlined" style="font-size:20px">security</span>
+      Security
+    </a>
+    <a href="#" class="nav-item" data-page="hardware" id="nav-hardware">
+      <span class="material-symbols-outlined" style="font-size:20px">router</span>
+      Hardware
+    </a>
+  </nav>
+
+  <!-- Bottom Actions -->
+  <div class="px-4 mt-auto space-y-2">
+    <button class="btn-primary w-full text-sm flex items-center justify-center gap-2" id="deploy-btn">
+      <span class="material-symbols-outlined text-sm">bolt</span>
+      Deploy Config
+    </button>
+
+    <div class="pt-4 space-y-0.5" style="border-top:1px solid rgba(255,255,255,0.04)">
+      <a href="#" class="nav-item text-xs py-2">
+        <span class="material-symbols-outlined" style="font-size:16px">terminal</span>
+        System Logs
+      </a>
+      <a href="#" class="nav-item text-xs py-2">
+        <span class="material-symbols-outlined" style="font-size:16px">help_outline</span>
+        Support
+      </a>
+    </div>
+
+    <!-- Version tag -->
+    <p class="text-[9px] font-label text-slate-600 text-center pt-2 pb-1">
+      SDN-OPT v2.0 · Flask+Mininet Ready
+    </p>
+  </div>
+</aside>
+
+
+<!-- =====================================================
+  MAIN CONTENT AREA
+  Offset: ml-64 pt-16, scrollable
+  ===================================================== -->
+<main id="app-main">
+
+  <!-- ============ PAGE: DASHBOARD ============ -->
+  <div class="page active" id="page-dashboard">
+    <header class="mb-10">
+      <h1 class="text-4xl font-extrabold tracking-tight font-headline text-on-surface mb-2">SDN Traffic Optimizer</h1>
+      <p class="text-secondary font-body font-medium">Live application-aware traffic monitoring and control.</p>
+    </header>
+
+    <!-- Top Row -->
+    <div class="grid grid-cols-12 gap-6 mb-6">
+      <!-- Neural Engine Status -->
+      <div class="col-span-12 lg:col-span-5 rounded-xl p-6 inner-glow border border-white/5 flex flex-col justify-between" style="background:#171f33">
+        <div>
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="font-headline font-bold text-lg text-on-surface">Neural Engine Status</h3>
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">psychology</span>
+          </div>
+          <div class="flex gap-3">
+            <div class="flex-1 p-3 rounded-xl border flex flex-col items-center" style="background:#001d07;border-color:rgba(74,225,118,0.2)">
+              <span class="text-[10px] uppercase font-label text-primary tracking-widest mb-1" data-bind="neural-engine-status">NORMAL</span>
+              <div class="h-1.5 w-full rounded-full" style="background:#4ae176;box-shadow:0 0 8px rgba(74,225,118,0.5)"></div>
+            </div>
+            <div class="flex-1 p-3 rounded-xl border flex flex-col items-center opacity-40" style="background:#060e20;border-color:rgba(69,70,77,0.1)">
+              <span class="text-[10px] uppercase font-label text-tertiary tracking-widest mb-1">CONGESTED</span>
+              <div class="h-1.5 w-full rounded-full bg-slate-700"></div>
+            </div>
+            <div class="flex-1 p-3 rounded-xl border flex flex-col items-center opacity-40" style="background:#060e20;border-color:rgba(69,70,77,0.1)">
+              <span class="text-[10px] uppercase font-label tracking-widest mb-1">REROUTING</span>
+              <div class="h-1.5 w-full rounded-full bg-slate-700"></div>
+            </div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4" style="border-top:1px solid rgba(255,255,255,0.04)">
+          <div class="flex justify-between items-end">
+            <div>
+              <p class="text-[10px] font-label text-slate-500 uppercase">System Latency</p>
+              <p class="text-2xl font-headline font-bold text-primary" data-bind="system-latency" data-unit="ms">0.42ms</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] font-label text-slate-500 uppercase">Confidence Score</p>
+              <p class="text-2xl font-headline font-bold text-on-surface" data-bind="confidence-score" data-unit="pct">99.8%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Active Path -->
+      <div class="col-span-12 lg:col-span-7 rounded-xl p-6 inner-glow border border-white/5 overflow-hidden relative" style="background:#171f33">
+        <div class="flex justify-between items-start mb-6">
+          <h3 class="font-headline font-bold text-lg text-on-surface">Current Active Path</h3>
+          <div class="px-3 py-1 rounded-full border" style="background:rgba(74,225,118,0.1);border-color:rgba(74,225,118,0.2)">
+            <span class="text-[10px] font-label text-primary font-bold tracking-widest">REAL-TIME MAPPING</span>
+          </div>
+        </div>
+        <!-- Path Nodes -->
+        <div class="flex items-center justify-between px-2 py-6">
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-label font-bold" style="background:#2d3449;border:2px solid #4ae176;box-shadow:0 0 15px rgba(74,225,118,0.2);color:#4ae176">h1</div>
+            <span class="text-[10px] text-slate-500 font-label">Source</span>
+          </div>
+          <div class="flex-1 h-px mx-2" style="background:linear-gradient(to right,#4ae176,#4ae176);position:relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary" style="box-shadow:0 0 8px rgba(74,225,118,0.8)"></div>
+          </div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-label font-bold" style="background:#2d3449;border:2px solid rgba(69,70,77,0.3);color:#dae2fd">s1</div>
+            <span class="text-[10px] text-slate-500 font-label">L3 Node</span>
+          </div>
+          <div class="flex-1 h-px mx-2 bg-slate-700"></div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-label font-bold" style="background:#2d3449;border:2px solid rgba(69,70,77,0.3);color:#dae2fd">s2</div>
+            <span class="text-[10px] text-slate-500 font-label">Core</span>
+          </div>
+          <div class="flex-1 h-px mx-2 bg-slate-700"></div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-label font-bold" style="background:#2d3449;border:2px solid rgba(69,70,77,0.3);color:#dae2fd">s4</div>
+            <span class="text-[10px] text-slate-500 font-label">Edge</span>
+          </div>
+          <div class="flex-1 h-px mx-2" style="background:linear-gradient(to right,#334155,#4ae176)"></div>
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-11 h-11 rounded-full flex items-center justify-center font-label font-bold" style="background:#2d3449;border:2px solid #4ae176;box-shadow:0 0 15px rgba(74,225,118,0.2);color:#4ae176">h2</div>
+            <span class="text-[10px] text-slate-500 font-label">Target</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="grid grid-cols-12 gap-6 mb-6">
+      <div class="col-span-12 md:col-span-4 glass-panel rounded-xl p-6 inner-glow h-48 flex flex-col justify-between">
+        <div class="flex items-center gap-2" style="color:rgba(218,226,253,0.7)">
+          <span class="material-symbols-outlined text-sm">show_chart</span>
+          <h4 class="font-label text-xs font-bold tracking-widest uppercase">Congestion Status</h4>
+        </div>
+        <div>
+          <p class="text-4xl font-headline font-extrabold text-on-surface" data-bind="congestion-state" data-unit="percentage">12.4<span class="text-lg font-medium text-slate-500">%</span></p>
+          <p class="text-primary text-xs font-label mt-1">↓ 2.1% from last hour</p>
+        </div>
+        <div class="w-full h-1 rounded-full overflow-hidden bg-slate-800">
+          <div class="bg-primary h-full" style="width:12.4%"></div>
+        </div>
+      </div>
+      <div class="col-span-12 md:col-span-4 glass-panel rounded-xl p-6 inner-glow h-48 flex flex-col justify-between">
+        <div class="flex items-center gap-2" style="color:rgba(218,226,253,0.7)">
+          <span class="material-symbols-outlined text-sm">swap_calls</span>
+          <h4 class="font-label text-xs font-bold tracking-widest uppercase">Rerouting Events</h4>
+        </div>
+        <div>
+          <p class="text-4xl font-headline font-extrabold text-on-surface" data-bind="reroute-state" data-unit="count">08</p>
+          <p class="text-slate-500 text-xs font-label mt-1">Last event 4m ago</p>
+        </div>
+        <div class="flex gap-1 h-8 items-end">
+          <div class="w-2 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:50%"></div>
+          <div class="w-2 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:75%"></div>
+          <div class="w-2 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.6);height:100%"></div>
+          <div class="w-2 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:37%"></div>
+          <div class="w-2 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.4);height:62%"></div>
+          <div class="w-2 rounded-t-sm chart-bar" style="background:#4ae176;height:87%"></div>
+        </div>
+      </div>
+      <div class="col-span-12 md:col-span-4 glass-panel rounded-xl p-6 inner-glow h-48 flex flex-col justify-between">
+        <div class="flex items-center gap-2" style="color:rgba(218,226,253,0.7)">
+          <span class="material-symbols-outlined text-sm">database</span>
+          <h4 class="font-label text-xs font-bold tracking-widest uppercase">Flow Statistics</h4>
+        </div>
+        <div>
+          <p class="text-4xl font-headline font-extrabold text-on-surface" data-bind="flow-throughput" data-unit="gbps">8.2<span class="text-lg font-medium text-slate-500"> Gbps</span></p>
+          <p class="text-slate-500 text-xs font-label mt-1">Avg payload 1.4KB</p>
+        </div>
+        <div class="flex justify-between text-[10px] font-label text-slate-500">
+          <span>TCP: 65%</span><span>UDP: 30%</span><span>ICMP: 5%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Terminal Log -->
+    <div class="rounded-xl border overflow-hidden shadow-2xl" style="background:#060e20;border-color:rgba(69,70,77,0.2)">
+      <div class="px-4 py-3 flex items-center justify-between" style="background:#222a3d">
+        <div class="flex items-center gap-3">
+          <div class="flex gap-1.5">
+            <div class="w-2.5 h-2.5 rounded-full" style="background:rgba(235,65,65,0.4)"></div>
+            <div class="w-2.5 h-2.5 rounded-full" style="background:rgba(74,225,118,0.4)"></div>
+            <div class="w-2.5 h-2.5 rounded-full" style="background:rgba(190,198,224,0.4)"></div>
+          </div>
+          <span class="font-label text-xs font-bold text-slate-400 ml-2">SYSTEM KERNEL LOGS</span>
+        </div>
+        <div class="flex items-center gap-4 text-slate-500">
+          <span class="text-[10px] font-label">TTY: pts/0</span>
+          <button class="material-symbols-outlined text-sm hover:text-primary transition-colors">download</button>
+        </div>
+      </div>
+      <div class="p-6 h-64 overflow-y-auto font-mono text-xs leading-relaxed" style="color:rgba(74,225,118,0.8);background:rgba(0,0,0,0.4)" id="dashboard-log">
+        <div class="flex gap-4"><span class="text-slate-600 shrink-0">[14:20:01]</span><span><span class="text-blue-400 font-bold">INFO:</span> Initializing Neural Pathfinding Engine... OK</span></div>
+        <div class="flex gap-4 mt-1"><span class="text-slate-600 shrink-0">[14:20:05]</span><span><span class="text-blue-400 font-bold">INFO:</span> Topology mapped. 4 nodes detected in path h1 → h2.</span></div>
+        <div class="flex gap-4 mt-1"><span class="text-slate-600 shrink-0">[14:21:44]</span><span><span class="text-yellow-400 font-bold">WARN:</span> Node s2 reporting high buffer utilization (78%).</span></div>
+        <div class="flex gap-4 mt-1"><span class="text-slate-600 shrink-0">[14:22:10]</span><span><span style="color:#4ae176" class="font-bold">EXEC:</span> Rerouting algorithm triggered via SDN controller.</span></div>
+        <div class="flex gap-4 mt-1"><span class="text-slate-600 shrink-0">[14:22:11]</span><span><span style="color:#4ae176" class="font-bold">SUCCESS:</span> Optimized flow active. Latency decreased by 14ms.</span></div>
+        <div class="flex gap-4 mt-1"><span class="text-slate-600 shrink-0">[14:25:00]</span><span><span class="text-blue-400 font-bold">INFO:</span> Pulse check: All instances operational.</span></div>
+        <div class="flex gap-4 mt-1 animate-pulse"><span class="text-slate-600 shrink-0">[14:25:32]</span><span><span style="color:#4ae176" class="font-bold">_</span></span></div>
+      </div>
+    </div>
+  </div><!-- /page-dashboard -->
+
+
+  <!-- ============ PAGE: TOPOLOGY ============ -->
+  <div class="page" id="page-topology">
+    <header class="mb-8">
+      <h1 class="font-headline text-4xl font-extrabold text-on-surface tracking-tight mb-2">Network Topology</h1>
+      <p class="font-body text-secondary opacity-70">Real-time visualization of SDN fabric and routing paths.</p>
+    </header>
+
+    <div class="grid grid-cols-12 gap-6">
+
+      <!-- Topology Canvas -->
+      <section class="col-span-12 lg:col-span-8 glass-panel rounded-xl relative overflow-hidden flex flex-col" style="height:500px">
+        <div class="absolute top-4 left-6 z-10 flex items-center gap-3 px-4 py-2 rounded-full backdrop-blur-md border"
+             style="background:rgba(6,14,32,0.8);border-color:rgba(69,70,77,0.1)">
+          <div class="w-2 h-2 rounded-full bg-primary pulse-dot"></div>
+          <span class="font-label text-xs tracking-wider uppercase">Live Topology Canvas</span>
+        </div>
+
+        <!-- TOPOLOGY SVG — Coordinates PRESERVED. Only CSS variables updated. -->
+        <div class="relative flex-1 flex items-center justify-center">
+          <svg class="w-full h-full p-12 overflow-visible" viewBox="0 0 800 400">
+            <!-- Active Path links -->
+            <path class="neon-pulse" d="M100 200 L300 100"
+                  stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
+            <!-- Congested link -->
+            <path class="error-pulse" d="M100 200 L300 300"
+                  stroke="var(--node-critical)" stroke-width="4"/>
+            <path class="neon-pulse" d="M300 100 L500 100"
+                  stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
+            <path d="M300 300 L500 300"
+                  stroke="var(--node-standby)" stroke-width="2"/>
+            <path class="neon-pulse" d="M500 100 L700 200"
+                  stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
+            <path d="M500 300 L700 200"
+                  stroke="var(--node-standby)" stroke-width="2"/>
+
+            <!-- EDGE_01 -->
+            <g transform="translate(100, 200)">
+              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">EDGE_01</text>
+            </g>
+            <!-- CORE_A -->
+            <g transform="translate(300, 100)">
+              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">CORE_A</text>
+            </g>
+            <!-- CORE_B (Error state) -->
+            <g transform="translate(300, 300)">
+              <circle class="error-pulse" fill="var(--tertiary-container)" r="24" stroke="var(--node-critical)" stroke-width="2"/>
+              <text dy=".3em" fill="var(--node-critical)" font-family="Space Grotesk" font-size="10" text-anchor="middle">CORE_B</text>
+            </g>
+            <!-- DISTR_1 -->
+            <g transform="translate(500, 100)">
+              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">DISTR_1</text>
+            </g>
+            <!-- DISTR_2 (Standby) -->
+            <g transform="translate(500, 300)">
+              <circle fill="var(--surface-base)" r="24" stroke="var(--node-standby)" stroke-width="2"/>
+              <text dy=".3em" fill="var(--outline)" font-family="Space Grotesk" font-size="10" text-anchor="middle">DISTR_2</text>
+            </g>
+            <!-- END_04 -->
+            <g transform="translate(700, 200)">
+              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
+              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">END_04</text>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Legend -->
+        <div class="p-6 flex gap-6" style="background:rgba(15,23,42,0.4);border-top:1px solid rgba(69,70,77,0.1)">
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm bg-primary"></div><span class="text-xs font-label text-slate-400">Active Path</span></div>
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm" style="background:#eb4141"></div><span class="text-xs font-label text-slate-400">Congested Link</span></div>
+          <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm" style="background:#45464d"></div><span class="text-xs font-label text-slate-400">Standby</span></div>
+        </div>
+      </section>
+
+      <!-- Node Info Panel -->
+      <section class="col-span-12 lg:col-span-4 glass-panel rounded-xl p-6 flex flex-col">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="font-headline font-bold text-xl">Node Info</h2>
+          <span class="material-symbols-outlined text-primary">info</span>
+        </div>
+        <div class="space-y-4 flex-1">
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Hostname</div>
+            <div class="font-headline text-lg font-bold text-on-surface">CORE-AS-091</div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="solid-card p-4 rounded-xl">
+              <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Status</div>
+              <div class="flex items-center gap-2 text-primary font-bold"><span class="w-2 h-2 rounded-full bg-primary"></span>Healthy</div>
+            </div>
+            <div class="solid-card p-4 rounded-xl">
+              <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Latency</div>
+              <div class="text-on-surface font-bold font-label">0.42 ms</div>
+            </div>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-2">Interfaces</div>
+            <div class="space-y-3">
+              <div class="flex justify-between text-xs"><span class="text-slate-400 font-label">eth0 (100G)</span><span class="text-primary">82% Load</span></div>
+              <div class="w-full h-1 rounded-full" style="background:#171f33"><div class="bg-primary h-1 rounded-full" style="width:82%"></div></div>
+              <div class="flex justify-between text-xs"><span class="text-slate-400 font-label">eth1 (100G)</span><span style="color:#eb4141">Critical Load</span></div>
+              <div class="w-full h-1 rounded-full" style="background:#171f33"><div class="h-1 rounded-full" style="width:96%;background:#eb4141"></div></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn-ghost w-full mt-6 text-sm flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">settings_ethernet</span>Interface Config
+        </button>
+      </section>
+
+      <!-- Path Selection -->
+      <section class="col-span-12 md:col-span-6 glass-panel rounded-xl p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 rounded-xl" style="background:rgba(74,225,118,0.1)">
+            <span class="material-symbols-outlined text-primary">route</span>
+          </div>
+          <h2 class="font-headline font-bold text-xl">Path Selection Logic</h2>
+        </div>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-4 rounded-xl border" style="background:#001d07;border-color:rgba(74,225,118,0.2)">
+            <div>
+              <div class="font-bold" style="color:#009542">Lowest Latency (Active)</div>
+              <div class="text-xs text-primary">Routing via Core-A and Distr-1</div>
+            </div>
+            <span class="material-symbols-outlined text-primary">check_circle</span>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-xl border solid-card hover:border-outline-variant cursor-pointer transition-colors">
+            <div><div class="font-bold text-slate-300">Cost-Optimized</div><div class="text-xs text-slate-500">Secondary routes with peering partners</div></div>
+            <span class="material-symbols-outlined text-slate-600">radio_button_unchecked</span>
+          </div>
+          <div class="flex items-center justify-between p-4 rounded-xl border solid-card hover:border-outline-variant cursor-pointer transition-colors">
+            <div><div class="font-bold text-slate-300">Resilient High-Availability</div><div class="text-xs text-slate-500">Active-Active redundancy multi-hop</div></div>
+            <span class="material-symbols-outlined text-slate-600">radio_button_unchecked</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Affected Node Metrics -->
+      <section class="col-span-12 md:col-span-6 glass-panel rounded-xl p-8">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 rounded-xl" style="background:rgba(235,65,65,0.1)">
+            <span class="material-symbols-outlined" style="color:#eb4141">warning</span>
+          </div>
+          <h2 class="font-headline font-bold text-xl">Affected Node Metrics</h2>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-4 rounded-xl border" style="background:rgba(57,0,3,0.2);border-color:rgba(235,65,65,0.2)">
+            <div class="text-[10px] font-label uppercase tracking-widest mb-1" style="color:#eb4141">Packet Loss</div>
+            <div class="text-3xl font-headline font-extrabold" style="color:#eb4141">4.2%</div>
+            <div class="text-xs text-slate-500 mt-1">CORE_B Instance</div>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">CPU Load</div>
+            <div class="text-3xl font-headline font-extrabold text-on-surface">94%</div>
+            <div class="text-xs text-slate-400 mt-1">CORE_B Process</div>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Queue Depth</div>
+            <div class="text-3xl font-headline font-extrabold text-on-surface">1.2k</div>
+            <div class="text-xs text-slate-400 mt-1">Pending Packets</div>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <div class="text-[10px] text-slate-500 font-label uppercase tracking-widest mb-1">Uptime</div>
+            <div class="text-3xl font-headline font-extrabold text-on-surface">99.1%</div>
+            <div class="text-xs text-slate-400 mt-1">Degraded State</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Event Logs -->
+      <section class="col-span-12 glass-panel rounded-xl p-6">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-secondary">terminal</span>
+            <h2 class="font-headline font-bold text-xl">Topology Event Logs</h2>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm font-label">
+            <thead>
+              <tr class="text-slate-500 text-left" style="border-bottom:1px solid rgba(69,70,77,0.1)">
+                <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Timestamp</th>
+                <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Event Type</th>
+                <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Source Node</th>
+                <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Message</th>
+                <th class="pb-4 font-medium uppercase tracking-wider text-[10px]">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid rgba(69,70,77,0.05)">
+                <td class="py-4 text-slate-400">14:22:01.092</td><td class="py-4">Path Re-Route</td><td class="py-4">CONTROLLER_01</td>
+                <td class="py-4 text-on-surface">Automatic switchover due to CORE_B congestion</td>
+                <td class="py-4"><span class="badge-active px-2 py-0.5 rounded text-[10px] font-bold">RESOLVED</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(69,70,77,0.05)">
+                <td class="py-4 text-slate-400">14:21:45.321</td><td class="py-4">Link Alert</td><td class="py-4">CORE_B</td>
+                <td class="py-4" style="color:#eb4141">Packet loss exceeding 3.5% threshold</td>
+                <td class="py-4"><span class="badge-critical px-2 py-0.5 rounded text-[10px] font-bold">ONGOING</span></td>
+              </tr>
+              <tr style="border-bottom:1px solid rgba(69,70,77,0.05)">
+                <td class="py-4 text-slate-400">14:18:22.115</td><td class="py-4">Node Discovery</td><td class="py-4">DISTR_2</td>
+                <td class="py-4 text-on-surface">New endpoint detected via adjacency hello</td>
+                <td class="py-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold" style="background:#1e293b;color:#94a3b8">INFO</span></td>
+              </tr>
+              <tr>
+                <td class="py-4 text-slate-400">14:15:01.992</td><td class="py-4">Protocol Auth</td><td class="py-4">EDGE_01</td>
+                <td class="py-4 text-on-surface">BGP session established with provider peer</td>
+                <td class="py-4"><span class="badge-active px-2 py-0.5 rounded text-[10px] font-bold">STABLE</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div><!-- /page-topology -->
+
+
+  <!-- ============ PAGE: OPTIMIZATION ============ -->
+  <div class="page" id="page-optimization">
+    <header class="flex justify-between items-center mb-10">
+      <div>
+        <h1 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">Optimization Engine</h1>
+        <p class="text-on-surface-variant font-body mt-1">Real-time decision-making and performance tuning.</p>
+      </div>
+      <button class="btn-primary flex items-center gap-2 text-sm glow-primary">
+        <span class="material-symbols-outlined text-sm">bolt</span>Deploy Config
+      </button>
+    </header>
+    <div class="grid grid-cols-12 gap-6">
+      <!-- Optimization Status -->
+      <section class="col-span-12 lg:col-span-4 glass-panel p-6 rounded-xl overflow-hidden relative">
+        <div class="absolute top-0 right-0 p-4 opacity-10"><span class="material-symbols-outlined text-6xl">settings_suggest</span></div>
+        <h3 class="font-label text-xs uppercase tracking-widest text-primary mb-6">Optimization Status</h3>
+        <div class="space-y-6">
+          <div class="flex justify-between items-end">
+            <div>
+              <p class="text-on-surface-variant text-sm mb-1">Current Mode</p>
+              <p class="text-2xl font-headline font-bold text-on-surface">PREDICTIVE_AUTO</p>
+            </div>
+            <span class="badge-active px-3 py-1 rounded-full text-[10px] font-bold font-label">ACTIVE</span>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="solid-card p-4 rounded-xl">
+              <p class="text-on-surface-variant text-xs mb-1">Strategy</p>
+              <p class="text-sm font-label font-medium">Latency Prioritized</p>
+            </div>
+            <div class="solid-card p-4 rounded-xl">
+              <p class="text-on-surface-variant text-xs mb-1">Cooldown</p>
+              <p class="text-sm font-label font-medium">120s (Standby)</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Path Optimization Result -->
+      <section class="col-span-12 lg:col-span-8 glass-panel p-6 rounded-xl">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="font-label text-xs uppercase tracking-widest text-primary">Path Optimization Result</h3>
+          <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+            <span class="material-symbols-outlined text-xs text-primary">update</span>Last compute: 14ms ago
+          </div>
+        </div>
+        <div class="flex items-center justify-between gap-8 h-32">
+          <div class="flex-1 flex flex-col items-center justify-center p-4 rounded-xl" style="background:rgba(6,14,32,0.3)">
+            <p class="text-[10px] uppercase font-label mb-2" style="color:#eb4141">Old Vector</p>
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-label text-on-surface-variant">AS_64512</span>
+              <span class="material-symbols-outlined" style="color:#eb4141">trending_down</span>
+              <span class="text-lg font-label text-on-surface-variant">AS_64520</span>
+            </div>
+            <p class="mt-2 text-xs font-mono" id="opt-old-latency" style="color:#eb4141">42ms latency</p>
+          </div>
+          <div class="flex flex-col items-center text-primary">
+            <span class="material-symbols-outlined text-3xl">arrow_forward_ios</span>
+            <p class="text-[10px] font-bold mt-1">RE-ROUTE</p>
+          </div>
+          <div class="flex-1 flex flex-col items-center justify-center p-4 rounded-xl border glow-primary" style="background:rgba(74,225,118,0.1);border-color:rgba(74,225,118,0.2)">
+            <p class="text-[10px] uppercase font-label text-primary mb-2">Optimized Vector</p>
+            <div class="flex items-center gap-3">
+              <span class="text-lg font-label text-on-surface">AS_64512</span>
+              <span class="material-symbols-outlined text-primary">trending_up</span>
+              <span class="text-lg font-label text-on-surface">AS_64530</span>
+            </div>
+            <p class="mt-2 text-xs font-mono text-primary" id="opt-new-latency">18ms latency</p>
+          </div>
+        </div>
+      </section>
+      <!-- Link Load Trend -->
+      <section class="col-span-12 lg:col-span-7 rounded-xl p-6" style="background:#131b2e">
+        <div class="flex justify-between items-center mb-8">
+          <h3 class="font-label text-xs uppercase tracking-widest text-secondary">Link Load Trend</h3>
+        </div>
+        <div class="flex items-end justify-between h-48 gap-3 pb-8">
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:65%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">08:00</span></div>
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:45%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">09:00</span></div>
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:85%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">10:00</span></div>
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:72%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">11:00</span></div>
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl bg-primary" style="height:92%"></div><span class="absolute text-[9px] font-label text-primary font-bold" style="bottom:-20px;left:50%;transform:translateX(-50%)">12:00</span></div>
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:55%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">13:00</span></div>
+          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:30%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">14:00</span></div>
+        </div>
+      </section>
+      <!-- Controller Decision -->
+      <section class="col-span-12 lg:col-span-5 rounded-xl p-6 border" style="background:#171f33;border-color:rgba(74,225,118,0.05)">
+        <h3 class="font-label text-xs uppercase tracking-widest text-primary mb-6">Controller Decision</h3>
+        <div class="space-y-4">
+          <div class="p-4 rounded-xl" style="background:#060e20;border-left:4px solid #4ae176">
+            <p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Primary Reason</p>
+            <p class="text-sm font-medium">Congestion at Edge Node 04 exceeds threshold (85%).</p>
+          </div>
+          <div class="solid-card p-4 rounded-xl">
+            <p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Action Executed</p>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-sm">swap_horiz</span>
+              <p class="text-sm font-medium">Re-balance flow 8821 to backup fiber.</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-6">
+            <div class="flex flex-col">
+              <span class="text-[10px] text-on-surface-variant font-label uppercase">Confidence</span>
+              <span class="text-2xl font-headline font-extrabold text-primary">98.4%</span>
+            </div>
+            <div class="w-24 h-1 rounded-full overflow-hidden" style="background:#2d3449">
+              <div class="h-full bg-primary" style="width:98%;box-shadow:0 0 8px rgba(74,225,118,0.5)"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Optimization Logs -->
+      <section class="col-span-12 lg:col-span-8 rounded-xl p-6" style="background:#060e20">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-label text-xs uppercase tracking-widest text-secondary">Optimization Logs</h3>
+          <button class="text-[10px] text-primary hover:underline font-label uppercase">Export CSV</button>
+        </div>
+        <div class="space-y-2 overflow-y-auto max-h-48 pr-2">
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:44:02]</span><span class="flex-1">Link integrity check passed: Node_FR_02</span><span class="text-[10px] text-slate-500">STATUS_OK</span></div>
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:43:55]</span><span class="flex-1">Triggering predictive reroute for flow ID:9920</span><span class="text-[10px] text-primary font-bold">EXECUTING</span></div>
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:42:10]</span><span class="flex-1">ML Model updated: v2.4.1 weights initialized</span><span class="text-[10px] text-slate-500">SYS_UPDATE</span></div>
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs" style="background:rgba(57,0,3,0.2);color:#eb4141"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(235,65,65,0.6)">[12:40:01]</span><span class="flex-1">Packet loss anomaly detected at Core_SW_01</span><span class="text-[10px] font-bold">WARNING</span></div>
+        </div>
+      </section>
+      <!-- Control Toggles -->
+      <section class="col-span-12 lg:col-span-4 glass-panel p-6 rounded-xl">
+        <h3 class="font-label text-xs uppercase tracking-widest text-primary mb-6">Control Toggles</h3>
+        <div class="space-y-4">
+          <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">auto_awesome</span><span class="text-sm font-medium">Predictive Routing</span></div>
+            <label class="toggle-wrapper"><input type="checkbox" checked id="toggle-predictive"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-surface-variant">energy_savings_leaf</span><span class="text-sm font-medium">Eco-Node Standby</span></div>
+            <label class="toggle-wrapper"><input type="checkbox" id="toggle-eco"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-on-surface-variant">shield_with_heart</span><span class="text-sm font-medium">Failover Loopback</span></div>
+            <label class="toggle-wrapper"><input type="checkbox" checked id="toggle-failover"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div><!-- /page-optimization -->
+
+
+  <!-- ============ PAGE: SECURITY ============ -->
+  <div class="page" id="page-security">
+    <header class="mb-8">
+      <h1 class="text-4xl font-extrabold font-headline tracking-tighter text-on-surface mb-2">Security Sentinel</h1>
+      <p class="text-secondary text-lg font-body">Predictive threat detection and automated anomaly intervention.</p>
+    </header>
+    <div class="space-y-6">
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 lg:col-span-8 rounded-xl p-6 inner-glow" style="background:#171f33">
+          <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">monitoring</span><h3 class="font-headline font-bold text-xl">Traffic Monitoring</h3></div>
+            <span class="badge-active px-2 py-1 rounded-full text-[10px] font-label font-bold uppercase">Live Stream</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-5 rounded-xl border" style="background:#131b2e;border-color:rgba(69,70,77,0.1)">
+              <div class="flex justify-between items-start mb-4"><span class="text-secondary text-sm font-label">Suspicious Activity</span><span class="flex items-center gap-1 text-xs font-bold" style="color:#eb4141"><span class="material-symbols-outlined text-sm">warning</span> High Alert</span></div>
+              <div class="text-4xl font-headline font-extrabold text-on-surface mb-2" data-bind="suspicious-activity">1,284</div>
+              <div class="w-full h-1 rounded-full overflow-hidden" style="background:#2d3449"><div class="h-full w-3/4 pulse-error" style="background:#eb4141"></div></div>
+            </div>
+            <div class="p-5 rounded-xl border" style="background:#131b2e;border-color:rgba(69,70,77,0.1)">
+              <div class="flex justify-between items-start mb-4"><span class="text-secondary text-sm font-label">Packet Drops</span><span class="flex items-center gap-1 text-xs font-bold text-primary"><span class="material-symbols-outlined text-sm">check_circle</span> Optimized</span></div>
+              <div class="text-4xl font-headline font-extrabold text-on-surface mb-2" data-bind="packet-drops">0.02%</div>
+              <div class="w-full h-1 rounded-full overflow-hidden" style="background:#2d3449"><div class="h-full bg-primary" style="width:8%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 lg:col-span-4 rounded-xl p-6 relative overflow-hidden flex flex-col justify-between" style="background:#390003">
+          <div class="absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl -mr-16 -mt-16" style="background:rgba(235,65,65,0.1)"></div>
+          <div>
+            <div class="flex items-center gap-3 mb-6"><span class="material-symbols-outlined" style="color:#eb4141;font-variation-settings:'FILL' 1">search_insights</span><h3 class="font-headline font-bold text-xl" style="color:#eb4141">Anomaly Detection</h3></div>
+            <p class="text-sm font-body mb-4" style="color:rgba(235,65,65,0.8)">AI engine detected unusual burst from Node-7X. Possible DDoS vector identified.</p>
+          </div>
+          <button class="btn-danger w-full text-sm active:scale-95">Isolate Source</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 lg:col-span-6 rounded-xl p-6 border" style="background:#131b2e;border-color:rgba(69,70,77,0.05)">
+          <h3 class="font-headline font-bold text-lg mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-secondary">donut_large</span>Flow Distribution</h3>
+          <div class="flex flex-col md:flex-row items-center gap-8">
+            <div class="relative w-40 h-40 shrink-0">
+              <svg class="w-full h-full" style="transform:rotate(-90deg)" viewBox="0 0 36 36">
+                <circle cx="18" cy="18" fill="none" r="16" stroke="#2d3449" stroke-width="3"/>
+                <circle cx="18" cy="18" fill="none" r="16" stroke="#4ae176" stroke-dasharray="75 100" stroke-width="3"/>
+                <circle cx="18" cy="18" fill="none" r="16" stroke="#bec6e0" stroke-dasharray="15 100" stroke-dashoffset="-75" stroke-width="3"/>
+                <circle cx="18" cy="18" fill="none" r="16" stroke="#eb4141" stroke-dasharray="10 100" stroke-dashoffset="-90" stroke-width="3"/>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-2xl font-bold font-label">12.4k</span><span class="text-[10px] text-secondary uppercase tracking-tighter">Total</span></div>
+            </div>
+            <div class="flex-1 w-full space-y-4">
+              <div class="flex justify-between items-center"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-primary"></div><span class="text-sm font-medium">Verified Total</span></div><span class="font-label text-sm">75%</span></div>
+              <div class="flex justify-between items-center"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-secondary"></div><span class="text-sm font-medium">Unknown Origin</span></div><span class="font-label text-sm">15%</span></div>
+              <div class="flex justify-between items-center"><div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full" style="background:#eb4141"></div><span class="text-sm font-medium">Blocked</span></div><span class="font-label text-sm">10%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-span-12 lg:col-span-6 rounded-xl p-6 glass-panel">
+          <h3 class="font-headline font-bold text-lg mb-6 flex items-center gap-2"><span class="material-symbols-outlined text-primary">trending_up</span>Security Risk Trend</h3>
+          <div class="h-48 flex items-end justify-between gap-2 px-2">
+            <div class="w-full rounded-t-xl chart-bar" style="background:rgba(74,225,118,0.2);height:30%"></div>
+            <div class="w-full rounded-t-xl chart-bar" style="background:rgba(74,225,118,0.2);height:45%"></div>
+            <div class="w-full rounded-t-xl chart-bar" style="background:rgba(74,225,118,0.2);height:35%"></div>
+            <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(235,65,65,0.4);height:85%"><div class="absolute -top-8 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[10px] text-white" style="background:#eb4141">Spike</div></div>
+            <div class="w-full rounded-t-xl chart-bar" style="background:rgba(74,225,118,0.2);height:60%"></div>
+            <div class="w-full rounded-t-xl chart-bar" style="background:rgba(74,225,118,0.2);height:40%"></div>
+            <div class="w-full rounded-t-xl chart-bar" style="background:rgba(74,225,118,0.2);height:25%"></div>
+            <div class="w-full rounded-t-xl chart-bar bg-primary" style="height:15%"></div>
+          </div>
+          <div class="flex justify-between mt-4 text-[10px] font-label text-secondary px-2"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>NOW</span></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-12 gap-6">
+        <div class="col-span-12 lg:col-span-8 rounded-xl p-6 border" style="background:#060e20;border-color:rgba(69,70,77,0.05)">
+          <div class="flex justify-between items-center mb-6"><h3 class="font-headline font-bold text-lg">Security Logs</h3><button class="text-secondary hover:text-primary text-sm flex items-center gap-1 transition-colors">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></button></div>
+          <div class="space-y-3">
+            <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-high transition-colors" style="background:#171f33"><span class="font-label text-xs text-secondary shrink-0">14:22:01</span><span class="text-xs font-bold shrink-0" style="color:#eb4141">[CRITICAL]</span><span class="text-sm text-on-surface truncate">Brute force attempt detected from IP 192.168.1.104</span><span class="ml-auto text-[10px] font-label px-2 py-0.5 rounded-full badge-critical">Auto-Mitigated</span></div>
+            <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-high transition-colors" style="background:#171f33"><span class="font-label text-xs text-secondary shrink-0">14:19:45</span><span class="text-xs font-bold text-primary shrink-0">[INFO]</span><span class="text-sm text-on-surface truncate">New routing policy applied to Core-Switch-01</span><span class="ml-auto text-[10px] font-label px-2 py-0.5 rounded-full badge-active">System</span></div>
+            <div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-high transition-colors" style="background:#171f33"><span class="font-label text-xs text-secondary shrink-0">14:15:12</span><span class="text-tertiary text-xs font-bold shrink-0">[WARN]</span><span class="text-sm text-on-surface truncate">Unusual port scan behavior on subnet 10.0.4.0/24</span><span class="ml-auto text-[10px] font-label px-2 py-0.5 rounded-full badge-warning">Monitoring</span></div>
+          </div>
+        </div>
+        <div class="col-span-12 lg:col-span-4 rounded-xl p-6 flex flex-col justify-between" style="background:#2d3449">
+          <div>
+            <h3 class="font-headline font-bold text-lg mb-4">Block Flow</h3>
+            <p class="text-secondary text-sm font-body mb-6">Manually intercept and drop packets from a specific source.</p>
+            <div class="space-y-4">
+              <div><label class="text-[10px] uppercase font-bold text-outline mb-1 block font-label">Source IP / Node ID</label><input type="text" placeholder="e.g. 172.16.254.1" class="w-full rounded-xl px-4 py-3 text-sm font-label focus:outline-none" style="background:#060e20;color:#dae2fd;border:1px solid rgba(69,70,77,0.2)"/></div>
+              <div class="flex items-center justify-between p-3 rounded-xl" style="background:#060e20">
+                <span class="text-sm font-medium">Deep Packet Inspection</span>
+                <label class="toggle-wrapper"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+          <button class="btn-danger w-full mt-6 text-sm flex items-center justify-center gap-2"><span class="material-symbols-outlined text-sm">block</span>Execute Emergency Block</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-security -->
+
+
+  <!-- ============ PAGE: HARDWARE ============ -->
+  <div class="page" id="page-hardware">
+    <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <h1 class="text-4xl font-extrabold font-headline tracking-tighter text-on-surface mb-2">Hardware Infrastructure</h1>
+        <p class="text-secondary text-lg font-body" style="opacity:0.8">Port-level diagnostics and real-time interface monitoring.</p>
+      </div>
+      <div class="flex items-center gap-3 px-4 py-2 rounded-xl border" style="background:#131b2e;border-color:rgba(69,70,77,0.1)">
+        <div class="w-3 h-3 rounded-full bg-primary pulse-dot" style="box-shadow:0 0 8px rgba(74,225,118,0.6)"></div>
+        <span class="font-label text-xs tracking-widest text-on-surface-variant">NODE: US-EAST-CORE-01</span>
+      </div>
+    </header>
+    <div class="grid grid-cols-12 gap-6 mb-6">
+      <!-- Switch Status -->
+      <section class="col-span-12 lg:col-span-5 rounded-xl p-6 flex flex-col gap-4" style="background:#131b2e">
+        <div class="flex justify-between items-center"><h3 class="font-headline font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary">dns</span>Switch Status List</h3><span class="font-label text-[10px] badge-active px-2 py-0.5 rounded">LIVE FEED</span></div>
+        <div class="space-y-3">
+          <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d"><div class="flex items-center gap-4"><span class="font-label font-bold text-primary">S1</span><div><p class="text-xs font-bold font-headline">Enterprise-Core-Alpha</p><p class="text-[10px] text-on-surface-variant font-label">Uptime: 432d 12h</p></div></div><div class="text-right"><p class="text-xs font-label text-primary">OPERATIONAL</p><p class="text-[10px] text-on-surface-variant">Temp: 34°C</p></div></div>
+          <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d"><div class="flex items-center gap-4"><span class="font-label font-bold text-primary">S2</span><div><p class="text-xs font-bold font-headline">Edge-Aggregation-01</p><p class="text-[10px] text-on-surface-variant font-label">Uptime: 12d 04h</p></div></div><div class="text-right"><p class="text-xs font-label text-primary">OPERATIONAL</p><p class="text-[10px] text-on-surface-variant">Temp: 41°C</p></div></div>
+          <div class="rounded-xl p-4 flex items-center justify-between transition-colors" style="background:#222a3d;border-left:4px solid #ffb3ad"><div class="flex items-center gap-4"><span class="font-label font-bold text-tertiary">S3</span><div><p class="text-xs font-bold font-headline">Storage-Fabric-West</p><p class="text-[10px] text-on-surface-variant font-label">Uptime: 0d 02h</p></div></div><div class="text-right"><p class="text-xs font-label text-tertiary">WARNING</p><p class="text-[10px] text-on-surface-variant">Temp: 58°C</p></div></div>
+          <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d"><div class="flex items-center gap-4"><span class="font-label font-bold text-primary">S4</span><div><p class="text-xs font-bold font-headline">Backup-San-Node</p><p class="text-[10px] text-on-surface-variant font-label">Uptime: 89d 21h</p></div></div><div class="text-right"><p class="text-xs font-label text-primary">OPERATIONAL</p><p class="text-[10px] text-on-surface-variant">Temp: 32°C</p></div></div>
+        </div>
+      </section>
+      <!-- Port Diagnostics -->
+      <section class="col-span-12 lg:col-span-7 rounded-xl p-6" style="background:#131b2e">
+        <div class="flex justify-between items-center mb-6"><h3 class="font-headline font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary">analytics</span>Port-Level Diagnostics</h3><span class="font-label text-[10px] text-on-surface-variant">84% POOL CAPACITY</span></div>
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="glass-panel p-5 rounded-xl border" style="border-color:rgba(74,225,118,0.05)"><p class="text-xs font-label text-on-surface-variant mb-3 uppercase tracking-tighter">Avg. Port Load</p><div class="flex items-baseline gap-2"><span class="text-5xl font-headline font-bold text-primary" data-bind="avg-port-load">62.8</span><span class="text-lg font-headline text-on-surface-variant">%</span></div><div class="mt-4 pt-4 flex justify-between" style="border-top:1px solid rgba(69,70,77,0.1)"><span class="text-[10px] font-label text-primary">+4.2% FROM PEAK</span><span class="material-symbols-outlined text-primary text-sm">trending_up</span></div></div>
+          <div class="glass-panel p-5 rounded-xl border" style="border-color:rgba(255,179,173,0.1)"><p class="text-xs font-label text-on-surface-variant mb-3 uppercase tracking-tighter">Interface Saturation</p><div class="flex items-baseline gap-2"><span class="text-5xl font-headline font-bold" style="color:#eb4141" data-bind="interface-saturation">14.2</span><span class="text-lg font-headline text-on-surface-variant">%</span></div><div class="mt-4 pt-4 flex justify-between" style="border-top:1px solid rgba(69,70,77,0.1)"><span class="text-[10px] font-label" style="color:#eb4141">3 PORTS THROTTLED</span><span class="material-symbols-outlined text-sm" style="color:#eb4141;font-variation-settings:'FILL' 1">warning</span></div></div>
+        </div>
+        <p class="text-[10px] font-label text-on-surface-variant mb-3 uppercase" style="letter-spacing:0.2em">Active Port Density (24h)</p>
+        <div class="h-12 w-full flex items-end gap-1">
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:30%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:45%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:40%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:65%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:85%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:90%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:70%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:50%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:60%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:75%"></div>
+          <div class="flex-1 rounded-t-sm bg-primary" style="height:95%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:80%"></div>
+        </div>
+      </section>
+    </div>
+    <div class="grid grid-cols-12 gap-6 mb-6">
+      <!-- Throughput -->
+      <section class="col-span-12 lg:col-span-4 rounded-xl p-6 flex flex-col justify-between border" style="background:#131b2e;border-color:rgba(69,70,77,0.05)">
+        <div>
+          <h3 class="font-headline font-bold text-on-surface flex items-center gap-2 mb-6"><span class="material-symbols-outlined text-primary">swap_vert</span>Throughput Metrics</h3>
+          <div class="space-y-6">
+            <div class="flex items-center justify-between"><div><p class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">RX Data Flow</p><p class="text-3xl font-headline font-bold text-primary" data-bind="rx-flow">48.2 GB/s</p></div><div class="w-16 h-8 flex items-end gap-0.5"><div class="w-full" style="background:rgba(74,225,118,0.4);height:60%"></div><div class="w-full" style="background:rgba(74,225,118,0.4);height:80%"></div><div class="w-full bg-primary" style="height:100%"></div><div class="w-full" style="background:rgba(74,225,118,0.4);height:70%"></div></div></div>
+            <div class="flex items-center justify-between"><div><p class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">TX Data Flow</p><p class="text-3xl font-headline font-bold text-on-surface" data-bind="tx-flow">31.7 GB/s</p></div><div class="w-16 h-8 flex items-end gap-0.5"><div class="w-full" style="background:rgba(218,226,253,0.2);height:40%"></div><div class="w-full" style="background:rgba(218,226,253,0.2);height:50%"></div><div class="w-full" style="background:rgba(218,226,253,0.4);height:60%"></div><div class="w-full" style="background:rgba(218,226,253,0.2);height:45%"></div></div></div>
+          </div>
+        </div>
+        <div class="mt-8 p-3 rounded-xl text-[10px] font-label leading-relaxed" style="background:#060e20;color:#bec6e0;border:1px solid rgba(69,70,77,0.1)">Aggregate throughput stable. No packet drop in last 300s.</div>
+      </section>
+      <!-- Heatmap -->
+      <section class="col-span-12 lg:col-span-8 rounded-xl p-6" style="background:#131b2e">
+        <div class="flex justify-between items-center mb-6"><h3 class="font-headline font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary">grid_view</span>Interface Latency Heatmap</h3><div class="flex items-center gap-4"><div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-primary"></div><span class="text-[10px] font-label text-on-surface-variant">Low</span></div><div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full" style="background:#eb4141"></div><span class="text-[10px] font-label text-on-surface-variant">High</span></div></div></div>
+        <div class="grid grid-cols-12 gap-1.5" id="heatmap-grid">
+          <!-- Generated heatmap cells -->
+        </div>
+        <div class="mt-6 flex justify-between text-[10px] font-label text-on-surface-variant"><span>INTERFACE 01-48</span><span>LAST UPDATE: 2 SECONDS AGO</span></div>
+      </section>
+    </div>
+    <div class="grid grid-cols-12 gap-6">
+      <section class="col-span-12 lg:col-span-9 rounded-xl overflow-hidden flex flex-col border" style="background:#060e20;border-color:rgba(69,70,77,0.1);max-height:256px">
+        <div class="px-6 py-4 flex justify-between items-center" style="background:rgba(34,42,61,0.5);border-bottom:1px solid rgba(69,70,77,0.1)"><h3 class="font-headline font-bold text-on-surface flex items-center gap-2"><span class="material-symbols-outlined text-primary">terminal</span>Hardware System Logs</h3><div class="flex gap-2 items-center"><span class="w-2 h-2 rounded-full pulse-error" style="background:#eb4141"></span><span class="text-[10px] font-label" style="color:#eb4141">STREAMING</span></div></div>
+        <div class="p-6 overflow-y-auto font-mono text-xs text-on-surface-variant space-y-1">
+          <p><span class="text-secondary-fixed-dim">[14:32:01]</span> <span class="text-primary font-bold">INFO:</span> Port Gi0/14 link transition from DOWN to UP.</p>
+          <p><span class="text-secondary-fixed-dim">[14:32:05]</span> <span class="text-primary font-bold">INFO:</span> Auto-negotiation successful for S2 Interface 09.</p>
+          <p><span class="text-secondary-fixed-dim">[14:32:12]</span> <span class="text-yellow-400 font-bold">WARN:</span> Elevated latency detected on Fabric-Link-7.</p>
+          <p><span class="text-secondary-fixed-dim">[14:32:20]</span> <span class="text-primary font-bold">INFO:</span> Configuration sync completed for switch cluster ALPHA.</p>
+          <p><span class="text-secondary-fixed-dim">[14:32:28]</span> <span class="font-bold" style="color:#eb4141">ALERT:</span> CRC error count threshold exceeded on Port S3-P15.</p>
+          <p><span class="text-secondary-fixed-dim">[14:32:35]</span> <span class="text-primary font-bold">INFO:</span> Temperature sensor within normal range (38°C).</p>
+        </div>
+      </section>
+      <section class="col-span-12 lg:col-span-3 rounded-xl p-6 border flex flex-col" style="background:#131b2e;border-color:rgba(235,65,65,0.1)">
+        <h3 class="font-headline font-bold text-on-surface mb-6 flex items-center gap-2"><span class="material-symbols-outlined" style="color:#eb4141">restart_alt</span>Execute Port Reset</h3>
+        <div class="flex-1 space-y-4">
+          <div><label class="text-[10px] font-label text-on-surface-variant block mb-2 uppercase tracking-widest">Select Target Switch</label><select class="w-full rounded-xl px-4 py-2 text-sm text-on-surface focus:outline-none" style="background:#060e20;border:1px solid rgba(69,70,77,0.2);color:#dae2fd"><option>Switch S3 (Storage-Fabric)</option><option>Switch S1 (Enterprise-Core)</option><option>Switch S2 (Edge-Agg)</option></select></div>
+          <div><label class="text-[10px] font-label text-on-surface-variant block mb-2 uppercase tracking-widest">Interface ID</label><input type="text" value="S3-P15" class="w-full rounded-xl px-4 py-2 text-sm font-label focus:outline-none" style="background:#060e20;border:1px solid rgba(69,70,77,0.2);color:#dae2fd"/></div>
+        </div>
+        <button class="w-full mt-6 font-bold font-headline text-xs flex items-center justify-center gap-2 py-3 rounded-xl border" style="background:#390003;color:#eb4141;border-color:rgba(235,65,65,0.3)" id="reset-port-btn">
+          <span class="material-symbols-outlined text-sm">warning</span>RESET INTERFACE
+        </button>
+      </section>
+    </div>
+  </div><!-- /page-hardware -->
+
+</main><!-- /app-main -->
+
+
+<!-- =====================================================
+  MOBILE BOTTOM NAVIGATION
+  ===================================================== -->
+<nav id="mobile-nav" aria-label="Mobile navigation">
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="dashboard">
+    <span class="material-symbols-outlined" style="font-size:20px">dashboard</span>
+    <span class="text-[9px] font-label">Dashboard</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="topology">
+    <span class="material-symbols-outlined" style="font-size:20px">hub</span>
+    <span class="text-[9px] font-label">Topology</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="optimization">
+    <span class="material-symbols-outlined" style="font-size:20px">insights</span>
+    <span class="text-[9px] font-label">Optimize</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="security">
+    <span class="material-symbols-outlined" style="font-size:20px">security</span>
+    <span class="text-[9px] font-label">Security</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="hardware">
+    <span class="material-symbols-outlined" style="font-size:20px">router</span>
+    <span class="text-[9px] font-label">Hardware</span>
+  </button>
+</nav>
+
+
+<!-- =====================================================
+  VANILLA JS: Routing, State, Interactivity
+  Zero-Framework: Pure JavaScript only
+  ===================================================== -->
+<script>
+/* ================================================================
+   SDN Traffic Optimizer — Application Router
+   Routing: Hash-based SPA navigation
+   Backend-ready: data-bind attributes on all live elements
+   ================================================================ */
+
+// === ROUTE DEFINITIONS ===
+const ROUTES = {
+  'dashboard':    { title: 'Dashboard — SDN Traffic Optimizer',            navId: 'nav-dashboard' },
+  'topology':     { title: 'Network Topology — SDN Traffic Optimizer',     navId: 'nav-topology' },
+  'optimization': { title: 'Optimization Engine — SDN Traffic Optimizer',  navId: 'nav-optimization' },
+  'security':     { title: 'Security Sentinel — SDN Traffic Optimizer',    navId: 'nav-security' },
+  'hardware':     { title: 'Hardware Infrastructure — SDN Traffic Optimizer', navId: 'nav-hardware' }
+};
+
+let currentPage = 'dashboard';
+
+// === NAVIGATION ===
+function navigateTo(page) {
+  if (!ROUTES[page]) page = 'dashboard';
+
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+
+  // Show target page
+  const targetPage = document.getElementById('page-' + page);
+  if (targetPage) targetPage.classList.add('active');
+
+  // Update sidebar active state
+  document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+  const activeNavItem = document.getElementById('nav-' + page);
+  if (activeNavItem) activeNavItem.classList.add('active');
+
+  // Update mobile nav
+  document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+    const isActive = btn.dataset.page === page;
+    btn.style.color = isActive ? '#4ae176' : '#64748b';
+    const icon = btn.querySelector('.material-symbols-outlined');
+    if (icon) icon.style.fontVariationSettings = isActive
+      ? "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24"
+      : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24";
+  });
+
+  // Update document title
+  document.title = ROUTES[page].title;
+
+  // Update URL hash (for deep-linking / Flask routing)
+  window.location.hash = '#/' + page;
+
+  // Scroll to top
+  document.getElementById('app-main').scrollTop = 0;
+
+  currentPage = page;
+
+  // Generate heatmap if hardware page
+  if (page === 'hardware') generateHeatmap();
+}
+
+// === SIDEBAR NAV CLICKS ===
+document.querySelectorAll('.nav-item[data-page]').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    navigateTo(item.dataset.page);
+    // Close mobile sidebar
+    document.getElementById('app-sidebar').classList.remove('open');
+  });
+});
+
+// === MOBILE NAV BUTTONS ===
+document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+});
+
+// === SIDEBAR TOGGLE (mobile) ===
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebar = document.getElementById('app-sidebar');
+if (sidebarToggle) {
+  sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+}
+
+// === HASH-BASED ROUTING ===
+function handleHashRoute() {
+  const hash = window.location.hash.replace('#/', '').replace('#', '');
+  const page = hash && ROUTES[hash] ? hash : 'dashboard';
+  navigateTo(page);
+}
+
+window.addEventListener('hashchange', handleHashRoute);
+
+// === DEPLOY CONFIG BUTTON ===
+const deployBtn = document.getElementById('deploy-btn');
+if (deployBtn) {
+  deployBtn.addEventListener('click', () => {
+    deployBtn.textContent = 'Deploying...';
+    deployBtn.disabled = true;
+    deployBtn.style.opacity = '0.7';
+    setTimeout(() => {
+      deployBtn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Deployed!';
+      setTimeout(() => {
+        deployBtn.innerHTML = '<span class="material-symbols-outlined text-sm">bolt</span> Deploy Config';
+        deployBtn.disabled = false;
+        deployBtn.style.opacity = '1';
+      }, 2000);
+    }, 1500);
+  });
+}
+
+// === HEATMAP GENERATOR (Hardware page) ===
+function generateHeatmap() {
+  const grid = document.getElementById('heatmap-grid');
+  if (!grid || grid.children.length > 0) return;
+
+  const portData = [
+    2,4,1,8,45,2,1,2,12,2,3,2,
+    2,2,120,2,2,2,2,2,2,4,2,2,
+    2,2,2,2,2,2,2,2,55,2,2,2,
+    2,2,2,2,2,2,2,2,2,2,2,2
+  ];
+
+  portData.forEach((latency, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'aspect-square rounded-sm cursor-help transition-all';
+    cell.title = `Port ${String(i+1).padStart(2,'0')}: ${latency}ms${latency > 30 ? ' — ALERT' : ''}`;
+
+    let bg;
+    if (latency > 80)       bg = 'rgba(235,65,65,0.7)';
+    else if (latency > 30)  bg = 'rgba(235,65,65,0.4)';
+    else if (latency > 10)  bg = 'rgba(74,225,118,0.7)';
+    else if (latency > 5)   bg = 'rgba(74,225,118,0.5)';
+    else                    bg = 'rgba(74,225,118,0.2)';
+
+    cell.style.background = bg;
+    cell.addEventListener('mouseenter', () => cell.style.transform = 'scale(1.15)');
+    cell.addEventListener('mouseleave', () => cell.style.transform = 'scale(1)');
+    grid.appendChild(cell);
+  });
+}
+
+// === SIMULATED LIVE LOG UPDATES ===
+const LOG_MESSAGES = [
+  { level: 'INFO',    color: '#60a5fa', text: 'Flow table updated on controller.' },
+  { level: 'INFO',    color: '#60a5fa', text: 'OSPF adjacency stabilized with CORE_A.' },
+  { level: 'WARN',    color: '#facc15', text: 'Buffer overflow risk on s3 port 7.' },
+  { level: 'SUCCESS', color: '#4ae176', text: 'Predictive reroute completed in 8ms.' },
+  { level: 'INFO',    color: '#60a5fa', text: 'QoS policy enforcement active.' },
+  { level: 'EXEC',    color: '#4ae176', text: 'Flow entry pushed to switch cluster ALPHA.' },
+];
+let logIndex = 0;
+
+function appendLiveLog() {
+  const logContainer = document.getElementById('dashboard-log');
+  if (!logContainer || currentPage !== 'dashboard') return;
+
+  const entry = LOG_MESSAGES[logIndex % LOG_MESSAGES.length];
+  logIndex++;
+
+  const now = new Date();
+  const ts = `[${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}]`;
+
+  const row = document.createElement('div');
+  row.className = 'flex gap-4 mt-1';
+  row.style.animation = 'fadeIn 0.3s ease';
+  row.innerHTML = `<span class="text-slate-600 shrink-0">${ts}</span><span><span style="color:${entry.color}" class="font-bold">${entry.level}:</span> ${entry.text}</span>`;
+  logContainer.appendChild(row);
+
+  // Keep only last 20 lines
+  while (logContainer.children.length > 20) logContainer.removeChild(logContainer.firstChild);
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+setInterval(appendLiveLog, 4500);
+
+// === BACKEND BINDING UTILITY ===
+// Usage: SDN.updateBinding('congestion-state', '18.2%')
+window.SDN = {
+  updateBinding(key, value) {
+    document.querySelectorAll(`[data-bind="${key}"]`).forEach(el => {
+      el.textContent = value;
+    });
+  },
+  // Update CSS variable (for topology colors etc.)
+  updateVar(varName, value) {
+    document.documentElement.style.setProperty(`--${varName}`, value);
+  },
+  // Trigger navigation
+  navigate(page) {
+    navigateTo(page);
+  }
+};
+
+// === INIT: Load page from hash or default ===
+(function init() {
+  handleHashRoute();
+  generateHeatmap();
+})();
+</script>
+
+<!-- =====================================================
+  STATE ENGINE — Loaded after router so SDN global exists
+  Zero layout changes: only JS state + bindings injected
+  ===================================================== -->
+<script src="app/engine.js"></script>
+
+<!-- =====================================================
+  INTELLIGENCE ENHANCEMENT LAYER v2.1
+  Stacks on engine.js: Timeline, Flow Intel, Predictive
+  Graph, Topology Story, Smart Simulate, Story Logs
+  ===================================================== -->
+<script src="app/engine2.js"></script>
+
+<!-- =====================================================
+  DEMO & PRESENTATION LAYER v1.0
+  Guided walkthrough, tooltips, explain mode, highlights
+  Keyboard: → Next  ← Prev  Esc Reset  A Auto
+  ===================================================== -->
+<script src="app/demo.js"></script>
+
+</body>
+</html>

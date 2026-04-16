@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Optimization Engine - Neural Overlay</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&amp;family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#001d07",
+                        "on-surface": "#dae2fd",
+                        "surface-container": "#171f33",
+                        "on-surface-variant": "#c6c6cd",
+                        "outline": "#909097",
+                        "primary-fixed-dim": "#4ae176",
+                        "surface-variant": "#2d3449",
+                        "inverse-on-surface": "#283044",
+                        "on-secondary-fixed": "#131b2e",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-tertiary": "#68000a",
+                        "surface-bright": "#31394d",
+                        "on-primary-fixed": "#002109",
+                        "secondary-container": "#3f465c",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#0b1326",
+                        "on-tertiary-fixed": "#410004",
+                        "surface-container-low": "#131b2e",
+                        "surface-container-high": "#222a3d",
+                        "on-primary": "#003915",
+                        "inverse-surface": "#dae2fd",
+                        "inverse-primary": "#006e2f",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#930013",
+                        "primary": "#4ae176",
+                        "outline-variant": "#45464d",
+                        "tertiary-fixed-dim": "#ffb3ad",
+                        "primary-fixed": "#6bff8f",
+                        "secondary": "#bec6e0",
+                        "secondary-fixed": "#dae2fd",
+                        "on-secondary-container": "#adb4ce",
+                        "error-container": "#93000a",
+                        "surface-container-lowest": "#060e20",
+                        "on-tertiary-container": "#eb4141",
+                        "tertiary-fixed": "#ffdad7",
+                        "surface": "#0b1326",
+                        "on-error": "#690005",
+                        "background": "#0b1326",
+                        "on-secondary": "#283044",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "surface-container-highest": "#2d3449",
+                        "tertiary-container": "#390003",
+                        "surface-tint": "#4ae176",
+                        "tertiary": "#ffb3ad",
+                        "on-background": "#dae2fd",
+                        "on-primary-fixed-variant": "#005321",
+                        "on-primary-container": "#009542"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(45, 52, 73, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(74, 225, 118, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glow-primary {
+            box-shadow: 0 0 20px rgba(74, 225, 118, 0.2);
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1326; }
+        ::-webkit-scrollbar-thumb { background: #2d3449; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-primary selection:text-on-primary">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col py-6 border-r border-slate-800/50 bg-slate-950 z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center glow-primary">
+<span class="material-symbols-outlined text-on-primary" data-icon="hub">hub</span>
+</div>
+<span class="text-primary font-headline font-bold text-lg tracking-tighter">Neural Overlay</span>
+</div>
+<nav class="flex-1 px-4 space-y-3">
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="dashboard">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="hub">hub</span>
+<span class="font-medium text-sm">Topology</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl bg-primary/10 text-primary border-r-4 border-primary transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="Insights">insights</span>
+<span class="font-medium text-sm">Optimization</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="security">security</span>
+<span class="font-medium text-sm">Security</span>
+</div>
+<div class="flex items-center px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-800/50 hover:text-slate-200 transition-all duration-300 cursor-pointer">
+<span class="material-symbols-outlined mr-3" data-icon="router">router</span>
+<span class="font-medium text-sm">Hardware</span>
+</div>
+</nav>
+<div class="px-4 mt-auto space-y-3">
+<div class="flex items-center px-4 py-2 text-slate-500 hover:text-slate-200 cursor-pointer transition-colors">
+<span class="material-symbols-outlined mr-3 text-sm" data-icon="terminal">terminal</span>
+<span class="text-xs font-label">System Logs</span>
+</div>
+<div class="flex items-center px-4 py-2 text-slate-500 hover:text-slate-200 cursor-pointer transition-colors">
+<span class="material-symbols-outlined mr-3 text-sm" data-icon="help_outline">help_outline</span>
+<span class="text-xs font-label">Support</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 p-8 min-h-screen">
+<!-- Top Navigation -->
+<header class="flex justify-between items-center mb-10">
+<div>
+<h1 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">Optimization Engine</h1>
+<p class="text-on-surface-variant font-body mt-1">Real-time decision-making and performance tuning.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 bg-primary text-on-primary font-label font-bold px-6 py-2.5 rounded-xl glow-primary hover:brightness-110 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+                    Deploy Config
+                </button>
+<div class="flex gap-2">
+<div class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</div>
+<div class="w-10 h-10 flex items-center justify-center rounded-xl bg-surface-container-high text-on-surface-variant cursor-pointer hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Top Row: Optimization Status -->
+<section class="col-span-12 lg:col-span-4 glass-panel p-6 rounded-xl overflow-hidden relative">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl" data-icon="settings_suggest">settings_suggest</span>
+</div>
+<h3 class="font-label text-xs uppercase tracking-widest text-primary-fixed-dim mb-6">Optimization Status</h3>
+<div class="space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<p class="text-on-surface-variant text-sm mb-1">Current Mode</p>
+<p class="text-2xl font-headline font-bold text-on-surface">PREDICTIVE_AUTO</p>
+</div>
+<span class="px-3 py-1 bg-primary/20 text-primary rounded-full text-[10px] font-bold tracking-tighter border border-primary/30">ACTIVE</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest/50 p-4 rounded-xl border border-outline-variant/10">
+<p class="text-on-surface-variant text-xs mb-1">Strategy</p>
+<p class="text-sm font-label font-medium">Latency Prioritized</p>
+</div>
+<div class="bg-surface-container-lowest/50 p-4 rounded-xl border border-outline-variant/10">
+<p class="text-on-surface-variant text-xs mb-1">Cooldown</p>
+<p class="text-sm font-label font-medium">120s (Standby)</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Top Row: Path Optimization Result -->
+<section class="col-span-12 lg:col-span-8 glass-panel p-6 rounded-xl">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-label text-xs uppercase tracking-widest text-primary-fixed-dim">Path Optimization Result</h3>
+<div class="flex items-center gap-2 text-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-xs text-primary" data-icon="update">update</span>
+                        Last compute: 14ms ago
+                    </div>
+</div>
+<div class="flex items-center justify-between gap-8 h-32">
+<div class="flex-1 flex flex-col items-center justify-center p-4 bg-surface-container-lowest/30 rounded-xl">
+<p class="text-[10px] uppercase font-label text-on-tertiary-container mb-2">Old Vector</p>
+<div class="flex items-center gap-3">
+<span class="text-lg font-label text-on-surface-variant">AS_64512</span>
+<span class="material-symbols-outlined text-on-tertiary-container" data-icon="trending_down">trending_down</span>
+<span class="text-lg font-label text-on-surface-variant">AS_64520</span>
+</div>
+<p class="mt-2 text-xs font-mono text-on-tertiary-container">42ms latency</p>
+</div>
+<div class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="arrow_forward_ios">arrow_forward_ios</span>
+<p class="text-[10px] font-bold mt-1">RE-ROUTE</p>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center p-4 bg-primary/10 rounded-xl border border-primary/20 glow-primary">
+<p class="text-[10px] uppercase font-label text-primary mb-2">Optimized Vector</p>
+<div class="flex items-center gap-3">
+<span class="text-lg font-label text-on-surface">AS_64512</span>
+<span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
+<span class="text-lg font-label text-on-surface">AS_64530</span>
+</div>
+<p class="mt-2 text-xs font-mono text-primary">18ms latency</p>
+</div>
+</div>
+</section>
+<!-- Middle Row: Link Load Trend -->
+<section class="col-span-12 lg:col-span-7 bg-surface-container-low p-6 rounded-xl">
+<div class="flex justify-between items-center mb-8">
+<h3 class="font-label text-xs uppercase tracking-widest text-secondary">Link Load Trend</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="text-[10px] text-on-surface-variant">Active Load</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+<span class="text-[10px] text-on-surface-variant">Buffer</span>
+</div>
+</div>
+</div>
+<div class="flex items-end justify-between h-48 gap-3">
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 h-[65%] rounded-t-lg transition-all hover:bg-primary/60"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">08:00</span>
+</div>
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 h-[45%] rounded-t-lg transition-all hover:bg-primary/60"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">09:00</span>
+</div>
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 h-[85%] rounded-t-lg transition-all hover:bg-primary/60"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">10:00</span>
+</div>
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 h-[72%] rounded-t-lg transition-all hover:bg-primary/60"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">11:00</span>
+</div>
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary h-[92%] rounded-t-lg transition-all hover:brightness-110"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-primary font-bold">12:00</span>
+</div>
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 h-[55%] rounded-t-lg transition-all hover:bg-primary/60"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">13:00</span>
+</div>
+<div class="w-full bg-secondary-container/20 rounded-t-lg relative group">
+<div class="absolute bottom-0 w-full bg-primary/40 h-[30%] rounded-t-lg transition-all hover:bg-primary/60"></div>
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">14:00</span>
+</div>
+</div>
+</section>
+<!-- Middle Row: Controller Decision -->
+<section class="col-span-12 lg:col-span-5 bg-surface-container p-6 rounded-xl border border-primary/5">
+<h3 class="font-label text-xs uppercase tracking-widest text-primary-fixed-dim mb-6">Controller Decision</h3>
+<div class="space-y-4">
+<div class="p-4 bg-surface-container-lowest rounded-xl border-l-4 border-primary">
+<p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Primary Reason</p>
+<p class="text-sm font-medium">Congestion at Edge Node 04 exceeds threshold (85%).</p>
+</div>
+<div class="p-4 bg-surface-container-lowest rounded-xl">
+<p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Action Executed</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="swap_horiz">swap_horiz</span>
+<p class="text-sm font-medium">Re-balance flow 8821 to backup fiber.</p>
+</div>
+</div>
+<div class="flex items-center justify-between mt-6">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-label uppercase">Confidence</span>
+<span class="text-2xl font-headline font-extrabold text-primary">98.4%</span>
+</div>
+<div class="w-24 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="w-[98%] h-full bg-primary shadow-[0_0_8px_rgba(74,225,118,0.5)]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Row: Optimization Logs -->
+<section class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-6 rounded-xl">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-label text-xs uppercase tracking-widest text-secondary">Optimization Logs</h3>
+<button class="text-[10px] text-primary hover:underline font-label uppercase">Export CSV</button>
+</div>
+<div class="space-y-2 overflow-y-auto max-h-48 pr-2">
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container/40 font-label text-xs text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="w-24 shrink-0 font-mono text-[10px] text-primary/60">[12:44:02]</span>
+<span class="flex-1">Link integrity check passed: Node_FR_02</span>
+<span class="text-[10px] text-on-secondary-fixed-variant">STATUS_OK</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container/40 font-label text-xs text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="w-24 shrink-0 font-mono text-[10px] text-primary/60">[12:43:55]</span>
+<span class="flex-1">Triggering predictive reroute for high-demand flow ID:9920</span>
+<span class="text-[10px] text-primary">EXECUTING</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-surface-container/40 font-label text-xs text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="w-24 shrink-0 font-mono text-[10px] text-primary/60">[12:42:10]</span>
+<span class="flex-1">ML Model updated: v2.4.1 weights initialized</span>
+<span class="text-[10px] text-on-secondary-fixed-variant">SYS_UPDATE</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-lg bg-tertiary-container/20 font-label text-xs text-on-tertiary-container hover:bg-tertiary-container/30 transition-colors">
+<span class="w-24 shrink-0 font-mono text-[10px] text-on-tertiary-container/60">[12:40:01]</span>
+<span class="flex-1">Packet loss anomaly detected at Core_SW_01 (0.04%)</span>
+<span class="text-[10px] font-bold">WARNING</span>
+</div>
+</div>
+</section>
+<!-- Bottom Row: Control Toggles -->
+<section class="col-span-12 lg:col-span-4 glass-panel p-6 rounded-xl">
+<h3 class="font-label text-xs uppercase tracking-widest text-primary-fixed-dim mb-6">Control Toggles</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 bg-surface-container-highest/20 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-sm font-medium">Predictive Routing</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-highest/20 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="energy_savings_leaf">energy_savings_leaf</span>
+<span class="text-sm font-medium">Eco-Node Standby</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-highest/20 rounded-xl">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="shield_with_heart">shield_with_heart</span>
+<span class="text-sm font-medium">Failover Loopback</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

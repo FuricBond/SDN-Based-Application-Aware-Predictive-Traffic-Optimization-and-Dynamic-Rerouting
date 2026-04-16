@@ -1,0 +1,121 @@
+<!-- ============================================================
+  SDN Traffic Optimizer — Shared Shell Layout (Reference)
+  This file documents the canonical navbar + sidebar structure.
+  The actual implementation is in ../index.html via JS injection.
+  ============================================================ -->
+
+<!-- TOP NAVBAR -->
+<header id="app-navbar">
+  <div class="flex items-center gap-3">
+    <!-- Mobile hamburger -->
+    <button id="sidebar-toggle" class="md:hidden text-slate-400 hover:text-primary transition-colors">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+    <!-- Brand -->
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center border border-primary/20">
+        <span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings:'FILL' 1">hub</span>
+      </div>
+      <span class="text-lg font-bold tracking-tighter text-primary font-headline">SDN Traffic Optimizer</span>
+    </div>
+    <!-- Desktop nav links -->
+    <nav class="hidden md:flex items-center gap-6 ml-6">
+      <a href="#" class="text-sm font-headline tracking-tight text-slate-400 hover:text-primary transition-colors">Network Stats</a>
+      <a href="#" class="text-sm font-headline tracking-tight text-slate-400 hover:text-primary transition-colors">Global View</a>
+      <a href="#" class="text-sm font-headline tracking-tight text-slate-400 hover:text-primary transition-colors">Admin</a>
+    </nav>
+  </div>
+  <div class="flex items-center gap-3">
+    <!-- Search -->
+    <div class="hidden md:flex relative items-center">
+      <span class="material-symbols-outlined absolute left-3 text-slate-400 text-sm">search</span>
+      <input type="text" placeholder="Search flows..." class="bg-surface-container-lowest border-none rounded-xl pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary w-56 text-on-surface font-label" style="background:#060e20; color:#dae2fd; outline:none;"/>
+    </div>
+    <!-- Icons -->
+    <button class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">notifications</button>
+    <button class="material-symbols-outlined text-slate-400 hover:text-primary transition-colors">settings</button>
+    <!-- Avatar -->
+    <div class="w-8 h-8 rounded-full border border-primary/20 overflow-hidden flex items-center justify-center bg-surface-container-high text-primary text-xs font-bold font-label">AD</div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside id="app-sidebar">
+  <!-- Brand block -->
+  <div class="px-6 mb-8">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">hub</span>
+      </div>
+      <div>
+        <p class="font-bold text-primary font-headline text-sm">Neural Overlay</p>
+        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-label">Active Instance</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 space-y-1">
+    <a href="#" class="nav-item active" data-page="dashboard">
+      <span class="material-symbols-outlined">dashboard</span>
+      Dashboard
+    </a>
+    <a href="#" class="nav-item" data-page="topology">
+      <span class="material-symbols-outlined">hub</span>
+      Topology
+    </a>
+    <a href="#" class="nav-item" data-page="optimization">
+      <span class="material-symbols-outlined">insights</span>
+      Optimization
+    </a>
+    <a href="#" class="nav-item" data-page="security">
+      <span class="material-symbols-outlined">security</span>
+      Security
+    </a>
+    <a href="#" class="nav-item" data-page="hardware">
+      <span class="material-symbols-outlined">router</span>
+      Hardware
+    </a>
+  </nav>
+
+  <!-- Bottom actions -->
+  <div class="px-4 mt-auto space-y-3">
+    <button class="btn-primary w-full text-sm">
+      Deploy Config
+    </button>
+    <div class="pt-4 border-t border-white/5 space-y-1">
+      <a href="#" class="nav-item text-xs">
+        <span class="material-symbols-outlined text-sm">terminal</span>
+        System Logs
+      </a>
+      <a href="#" class="nav-item text-xs">
+        <span class="material-symbols-outlined text-sm">help_outline</span>
+        Support
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav id="mobile-nav">
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="dashboard">
+    <span class="material-symbols-outlined text-sm">dashboard</span>
+    <span class="text-[9px] font-label">Dashboard</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="topology">
+    <span class="material-symbols-outlined text-sm">hub</span>
+    <span class="text-[9px] font-label">Topology</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="optimization">
+    <span class="material-symbols-outlined text-sm">insights</span>
+    <span class="text-[9px] font-label">Optimize</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="security">
+    <span class="material-symbols-outlined text-sm">security</span>
+    <span class="text-[9px] font-label">Security</span>
+  </button>
+  <button class="flex flex-col items-center gap-1 text-slate-500 mobile-nav-btn" data-page="hardware">
+    <span class="material-symbols-outlined text-sm">router</span>
+    <span class="text-[9px] font-label">Hardware</span>
+  </button>
+</nav>

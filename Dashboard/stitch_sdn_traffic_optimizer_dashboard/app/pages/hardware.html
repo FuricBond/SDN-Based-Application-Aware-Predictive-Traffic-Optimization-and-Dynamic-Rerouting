@@ -1,0 +1,308 @@
+<!-- page: hardware -->
+<!-- Route: /hardware | Title: Hardware Infrastructure — SDN Traffic Optimizer -->
+<div class="page" id="page-hardware">
+  <!-- Header -->
+  <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <div>
+      <h1 class="text-4xl font-extrabold font-headline tracking-tighter text-on-surface mb-2">Hardware Infrastructure</h1>
+      <p class="text-secondary text-lg font-body" style="opacity:0.8">Port-level diagnostics and real-time interface monitoring.</p>
+    </div>
+    <div class="flex items-center gap-3 px-4 py-2 rounded-xl border" style="background:#131b2e;border-color:rgba(69,70,77,0.1)">
+      <div class="w-3 h-3 rounded-full bg-primary pulse-dot" style="box-shadow:0 0 8px rgba(74,225,118,0.6)"></div>
+      <span class="font-label text-xs tracking-widest text-on-surface-variant">NODE: US-EAST-CORE-01</span>
+    </div>
+  </header>
+
+  <!-- Top Row: Switch Status + Port Diagnostics -->
+  <div class="grid grid-cols-12 gap-6 mb-6">
+
+    <!-- Switch Status List -->
+    <section class="col-span-12 lg:col-span-5 rounded-xl p-6 flex flex-col gap-6 relative overflow-hidden" style="background:#131b2e">
+      <div class="flex justify-between items-center">
+        <h3 class="font-headline font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">dns</span>Switch Status List
+        </h3>
+        <span class="font-label text-[10px] text-primary badge-active px-2 py-0.5 rounded">LIVE FEED</span>
+      </div>
+      <div class="space-y-3">
+        <!-- S1 -->
+        <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d">
+          <div class="flex items-center gap-4">
+            <span class="font-label font-bold text-primary">S1</span>
+            <div>
+              <p class="text-xs font-bold font-headline">Enterprise-Core-Alpha</p>
+              <p class="text-[10px] text-on-surface-variant font-label">Uptime: 432d 12h</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs font-label text-primary">OPERATIONAL</p>
+            <p class="text-[10px] text-on-surface-variant">Temp: 34°C</p>
+          </div>
+        </div>
+        <!-- S2 -->
+        <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d">
+          <div class="flex items-center gap-4">
+            <span class="font-label font-bold text-primary">S2</span>
+            <div>
+              <p class="text-xs font-bold font-headline">Edge-Aggregation-01</p>
+              <p class="text-[10px] text-on-surface-variant font-label">Uptime: 12d 04h</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs font-label text-primary">OPERATIONAL</p>
+            <p class="text-[10px] text-on-surface-variant">Temp: 41°C</p>
+          </div>
+        </div>
+        <!-- S3 WARNING -->
+        <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d;border-left:4px solid #ffb3ad">
+          <div class="flex items-center gap-4">
+            <span class="font-label font-bold text-tertiary">S3</span>
+            <div>
+              <p class="text-xs font-bold font-headline">Storage-Fabric-West</p>
+              <p class="text-[10px] text-on-surface-variant font-label">Uptime: 0d 02h</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs font-label text-tertiary">WARNING</p>
+            <p class="text-[10px] text-on-surface-variant">Temp: 58°C</p>
+          </div>
+        </div>
+        <!-- S4 -->
+        <div class="rounded-xl p-4 flex items-center justify-between hover:bg-surface-container-highest transition-colors" style="background:#222a3d">
+          <div class="flex items-center gap-4">
+            <span class="font-label font-bold text-primary">S4</span>
+            <div>
+              <p class="text-xs font-bold font-headline">Backup-San-Node</p>
+              <p class="text-[10px] text-on-surface-variant font-label">Uptime: 89d 21h</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-xs font-label text-primary">OPERATIONAL</p>
+            <p class="text-[10px] text-on-surface-variant">Temp: 32°C</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Port-Level Diagnostics -->
+    <section class="col-span-12 lg:col-span-7 rounded-xl p-6" style="background:#131b2e">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-headline font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">analytics</span>Port-Level Diagnostics
+        </h3>
+        <div class="flex gap-2 items-center">
+          <div class="h-2 w-16 rounded-full overflow-hidden" style="background:#2d3449">
+            <div class="bg-primary h-full" style="width:84%"></div>
+          </div>
+          <span class="font-label text-[10px] text-on-surface-variant">84% POOL</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="glass-panel p-5 rounded-xl border" style="border-color:rgba(74,225,118,0.05)">
+          <p class="text-xs font-label text-on-surface-variant mb-4 uppercase tracking-tighter">Avg. Port Load</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-5xl font-headline font-bold text-primary" data-bind="avg-port-load" data-unit="pct">62.8</span>
+            <span class="text-lg font-headline text-on-surface-variant">%</span>
+          </div>
+          <div class="mt-4 pt-4 flex justify-between items-center" style="border-top:1px solid rgba(69,70,77,0.1)">
+            <span class="text-[10px] font-label text-primary">+4.2% FROM PEAK</span>
+            <span class="material-symbols-outlined text-primary text-sm">trending_up</span>
+          </div>
+        </div>
+        <div class="glass-panel p-5 rounded-xl border" style="border-color:rgba(255,179,173,0.1)">
+          <p class="text-xs font-label text-on-surface-variant mb-4 uppercase tracking-tighter">Interface Saturation</p>
+          <div class="flex items-baseline gap-2">
+            <span class="text-5xl font-headline font-bold" style="color:#eb4141" data-bind="interface-saturation" data-unit="pct">14.2</span>
+            <span class="text-lg font-headline text-on-surface-variant">%</span>
+          </div>
+          <div class="mt-4 pt-4 flex justify-between items-center" style="border-top:1px solid rgba(69,70,77,0.1)">
+            <span class="text-[10px] font-label" style="color:#eb4141">3 PORTS THROTTLED</span>
+            <span class="material-symbols-outlined text-sm" style="color:#eb4141;font-variation-settings:'FILL' 1">warning</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6">
+        <p class="text-[10px] font-label text-on-surface-variant mb-3 uppercase" style="letter-spacing:0.2em">Active Port Density (24h)</p>
+        <div class="h-12 w-full flex items-end gap-1">
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:30%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:45%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:40%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:65%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:85%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:90%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:70%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:50%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:60%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:75%"></div>
+          <div class="flex-1 rounded-t-sm bg-primary" style="height:95%"></div>
+          <div class="flex-1 rounded-t-sm chart-bar" style="background:rgba(74,225,118,0.2);height:80%"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Middle Row: Throughput + Latency Heatmap -->
+  <div class="grid grid-cols-12 gap-6 mb-6">
+
+    <!-- Throughput Metrics -->
+    <section class="col-span-12 lg:col-span-4 rounded-xl p-6 flex flex-col justify-between border" style="background:#131b2e;border-color:rgba(69,70,77,0.05)">
+      <div>
+        <h3 class="font-headline font-bold text-on-surface flex items-center gap-2 mb-6">
+          <span class="material-symbols-outlined text-primary">swap_vert</span>Throughput Metrics
+        </h3>
+        <div class="space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">RX Data Flow</p>
+              <p class="text-3xl font-headline font-bold text-primary" data-bind="rx-flow" data-unit="gbps">48.2 GB/s</p>
+            </div>
+            <div class="w-16 h-8 flex items-end gap-0.5">
+              <div class="w-full" style="background:rgba(74,225,118,0.4);height:60%"></div>
+              <div class="w-full" style="background:rgba(74,225,118,0.4);height:80%"></div>
+              <div class="w-full bg-primary" style="height:100%"></div>
+              <div class="w-full" style="background:rgba(74,225,118,0.4);height:70%"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-label text-on-surface-variant uppercase tracking-widest">TX Data Flow</p>
+              <p class="text-3xl font-headline font-bold text-on-surface" data-bind="tx-flow" data-unit="gbps">31.7 GB/s</p>
+            </div>
+            <div class="w-16 h-8 flex items-end gap-0.5">
+              <div class="w-full" style="background:rgba(218,226,253,0.2);height:40%"></div>
+              <div class="w-full" style="background:rgba(218,226,253,0.2);height:50%"></div>
+              <div class="w-full" style="background:rgba(218,226,253,0.4);height:60%"></div>
+              <div class="w-full" style="background:rgba(218,226,253,0.2);height:45%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 p-3 rounded-xl text-[10px] font-label leading-relaxed" style="background:#060e20;border:1px solid rgba(69,70,77,0.1);color:#bec6e0">
+        Aggregate cluster throughput is stable within normal operational parameters. No packet drop detected in last 300s.
+      </div>
+    </section>
+
+    <!-- Interface Latency Heatmap -->
+    <section class="col-span-12 lg:col-span-8 rounded-xl p-6" style="background:#131b2e">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-headline font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">grid_view</span>Interface Latency Heatmap
+        </h3>
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full bg-primary"></div><span class="text-[10px] font-label text-on-surface-variant">Low</span></div>
+          <div class="flex items-center gap-1.5"><div class="w-2 h-2 rounded-full" style="background:#eb4141"></div><span class="text-[10px] font-label text-on-surface-variant">High</span></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-12 gap-1.5">
+        <div class="aspect-square rounded-sm cursor-help" title="Port 01: 2ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 02: 4ms" style="background:rgba(74,225,118,0.4)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 03: 1ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 04: 8ms" style="background:rgba(74,225,118,0.6)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 05: 45ms — WARN" style="background:rgba(235,65,65,0.3)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 06: 2ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 07: 1ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 08: 2ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 09: 12ms" style="background:rgba(74,225,118,0.8)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 10: 2ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 11: 3ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 12: 2ms" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" title="Port 15: 120ms — ALERT" style="background:rgba(235,65,65,0.6)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.4)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(235,65,65,0.4)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+        <div class="aspect-square rounded-sm cursor-help" style="background:rgba(74,225,118,0.2)"></div>
+      </div>
+      <div class="mt-6 flex justify-between items-center text-[10px] font-label text-on-surface-variant">
+        <span>INTERFACE 01-48</span><span>LAST UPDATE: 2 SECONDS AGO</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bottom Row: Logs + Execute Port Reset -->
+  <div class="grid grid-cols-12 gap-6">
+
+    <!-- Hardware System Logs -->
+    <section class="col-span-12 lg:col-span-9 rounded-xl overflow-hidden flex flex-col border" style="background:#060e20;border-color:rgba(69,70,77,0.1);max-height:256px">
+      <div class="px-6 py-4 flex justify-between items-center" style="background:rgba(34,42,61,0.5);border-bottom:1px solid rgba(69,70,77,0.1)">
+        <h3 class="font-headline font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">terminal</span>Hardware System Logs
+        </h3>
+        <div class="flex gap-2 items-center">
+          <span class="w-2 h-2 rounded-full pulse-error" style="background:#eb4141"></span>
+          <span class="text-[10px] font-label" style="color:#eb4141">STREAMING</span>
+        </div>
+      </div>
+      <div class="p-6 overflow-y-auto font-mono text-xs text-on-surface-variant space-y-1">
+        <p><span class="text-secondary-fixed-dim">[14:32:01]</span> <span class="text-primary font-bold">INFO:</span> Port Gi0/14 link transition from DOWN to UP.</p>
+        <p><span class="text-secondary-fixed-dim">[14:32:05]</span> <span class="text-primary font-bold">INFO:</span> Auto-negotiation successful for S2 Interface 09.</p>
+        <p><span class="text-secondary-fixed-dim">[14:32:12]</span> <span class="text-yellow-400 font-bold">WARN:</span> Elevated latency detected on Fabric-Link-7.</p>
+        <p><span class="text-secondary-fixed-dim">[14:32:20]</span> <span class="text-primary font-bold">INFO:</span> Configuration sync completed for switch cluster ALPHA.</p>
+        <p><span class="text-secondary-fixed-dim">[14:32:28]</span> <span class="font-bold" style="color:#eb4141">ALERT:</span> CRC error count threshold exceeded on Port S3-P15.</p>
+        <p><span class="text-secondary-fixed-dim">[14:32:35]</span> <span class="text-primary font-bold">INFO:</span> Temperature sensor within normal range (38°C).</p>
+        <p><span class="text-secondary-fixed-dim">[14:32:41]</span> <span class="text-primary font-bold">INFO:</span> SNMP polling interval adjusted to 500ms.</p>
+      </div>
+    </section>
+
+    <!-- Execute Port Reset -->
+    <section class="col-span-12 lg:col-span-3 rounded-xl p-6 border flex flex-col" style="background:#131b2e;border-color:rgba(235,65,65,0.1)">
+      <h3 class="font-headline font-bold text-on-surface mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined" style="color:#eb4141">restart_alt</span>Execute Port Reset
+      </h3>
+      <div class="flex-1 space-y-4">
+        <div>
+          <label class="text-[10px] font-label text-on-surface-variant block mb-2 uppercase tracking-widest">Select Target Switch</label>
+          <select class="w-full rounded-xl px-4 py-2 text-sm text-on-surface focus:outline-none"
+                  style="background:#060e20;border:1px solid rgba(69,70,77,0.2);color:#dae2fd">
+            <option>Switch S3 (Storage-Fabric)</option>
+            <option>Switch S1 (Enterprise-Core)</option>
+            <option>Switch S2 (Edge-Agg)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-label text-on-surface-variant block mb-2 uppercase tracking-widest">Interface ID</label>
+          <input type="text" value="S3-P15" class="w-full rounded-xl px-4 py-2 text-sm font-label focus:outline-none"
+                 style="background:#060e20;border:1px solid rgba(69,70,77,0.2);color:#dae2fd"/>
+        </div>
+      </div>
+      <button class="w-full mt-6 font-bold font-headline text-xs flex items-center justify-center gap-2 py-3 rounded-xl border transition-colors"
+              style="background:#390003;color:#eb4141;border-color:rgba(235,65,65,0.3)"
+              onmouseover="this.style.background='#eb4141';this.style.color='#fff'"
+              onmouseout="this.style.background='#390003';this.style.color='#eb4141'">
+        <span class="material-symbols-outlined text-sm">warning</span>
+        RESET INTERFACE
+      </button>
+    </section>
+
+  </div>
+</div><!-- /page-hardware -->

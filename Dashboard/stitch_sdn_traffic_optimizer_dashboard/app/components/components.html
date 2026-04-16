@@ -1,0 +1,144 @@
+<!--
+  SDN Traffic Optimizer — Reusable Component Library
+  Usage: Reference these snippets when building new sections.
+  All components are self-contained Tailwind-based HTML blocks.
+  Zero-framework: HTML + Vanilla JS + TailwindCSS only.
+-->
+
+<!-- ====================================================
+  1. KPI METRIC BOX
+  Usage: Kongestion%, Flow Gbps, Rerouting count, etc.
+  ==================================================== -->
+<!--
+<div class="glass-panel rounded-xl p-6 inner-glow h-48 flex flex-col justify-between">
+  <div class="flex items-center gap-2 text-on-surface/70">
+    <span class="material-symbols-outlined text-sm">show_chart</span>
+    <h4 class="font-label text-xs font-bold tracking-widest uppercase">Congestion Status</h4>
+  </div>
+  <div>
+    <p class="text-4xl font-headline font-extrabold text-on-surface"
+       data-bind="congestion-state" data-unit="percentage">12.4<span class="text-lg font-medium text-slate-500">%</span></p>
+    <p class="text-primary text-xs font-label mt-1">↓ 2.1% from last hour</p>
+  </div>
+  <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+    <div class="bg-primary h-full" style="width: 12.4%"></div>
+  </div>
+</div>
+-->
+
+<!-- ====================================================
+  2. STATUS BADGE
+  ==================================================== -->
+<!--
+<span class="px-3 py-1 rounded-full text-[10px] font-label font-bold tracking-widest uppercase badge-active">ACTIVE</span>
+<span class="px-3 py-1 rounded-full text-[10px] font-label font-bold tracking-widest uppercase badge-warning">WARNING</span>
+<span class="px-3 py-1 rounded-full text-[10px] font-label font-bold tracking-widest uppercase badge-critical">CRITICAL</span>
+<span class="px-3 py-1 rounded-full text-[10px] font-label font-bold tracking-widest uppercase badge-rerouting">REROUTING</span>
+-->
+
+<!-- ====================================================
+  3. LOG PANEL (Terminal Style)
+  ==================================================== -->
+<!--
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/10 overflow-hidden">
+  <div class="px-4 py-3 bg-surface-container-high flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex gap-1.5">
+        <div class="w-2.5 h-2.5 rounded-full bg-on-tertiary-container/40"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-primary/40"></div>
+        <div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed-dim/40"></div>
+      </div>
+      <span class="font-label text-xs font-bold text-slate-400">SYSTEM KERNEL LOGS</span>
+    </div>
+    <span class="text-[10px] font-label text-slate-500">TTY: pts/0</span>
+  </div>
+  <div class="p-6 h-64 overflow-y-auto font-mono text-xs leading-relaxed" id="log-output">
+    <div class="flex gap-4">
+      <span class="text-slate-600 shrink-0">[14:20:01]</span>
+      <span><span class="text-blue-400 font-bold">INFO:</span> System initialized</span>
+    </div>
+    <div class="flex gap-4">
+      <span class="text-slate-600 shrink-0">[14:21:44]</span>
+      <span><span class="text-yellow-400 font-bold">WARN:</span> Node s2 high buffer (78%)</span>
+    </div>
+  </div>
+</div>
+-->
+
+<!-- ====================================================
+  4. CARD COMPONENT (glass-panel variant)
+  ==================================================== -->
+<!--
+<div class="glass-panel rounded-xl p-6 inner-glow border border-white/5">
+  <div class="flex justify-between items-start mb-4">
+    <h3 class="font-headline font-bold text-lg text-on-surface">Card Title</h3>
+    <span class="material-symbols-outlined text-primary">psychology</span>
+  </div>
+  <p class="text-secondary text-sm font-body">Card content goes here.</p>
+</div>
+-->
+
+<!-- ====================================================
+  5. CHART CONTAINER (bar chart, CSS-based)
+  ==================================================== -->
+<!--
+<div class="flex items-end justify-between h-48 gap-3">
+  <div class="w-full bg-secondary-container/20 rounded-t-xl relative group chart-bar">
+    <div class="absolute bottom-0 w-full bg-primary/40 h-[65%] rounded-t-xl"></div>
+    <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-on-surface-variant">08:00</span>
+  </div>
+  <div class="w-full bg-secondary-container/20 rounded-t-xl relative group chart-bar">
+    <div class="absolute bottom-0 w-full bg-primary h-[92%] rounded-t-xl"></div>
+    <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-label text-primary font-bold">NOW</span>
+  </div>
+</div>
+-->
+
+<!-- ====================================================
+  6. TOGGLE SWITCH
+  ==================================================== -->
+<!--
+<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(45,52,73,0.3)">
+  <div class="flex items-center gap-3">
+    <span class="material-symbols-outlined text-primary">auto_awesome</span>
+    <span class="text-sm font-medium">Predictive Routing</span>
+  </div>
+  <label class="toggle-wrapper">
+    <input type="checkbox" checked>
+    <span class="toggle-slider"></span>
+  </label>
+</div>
+-->
+
+<!-- ====================================================
+  7. BUTTON VARIANTS
+  ==================================================== -->
+<!--
+<button class="btn-primary text-sm">Deploy Config</button>
+<button class="btn-danger text-sm flex items-center gap-2">
+  <span class="material-symbols-outlined text-sm">block</span>
+  Execute Block
+</button>
+<button class="btn-ghost text-sm">Interface Config</button>
+-->
+
+<!-- ====================================================
+  8. NODE PATH VISUALIZER
+  ==================================================== -->
+<!--
+<div class="flex items-center justify-between px-4 py-8">
+  <div class="flex flex-col items-center gap-2">
+    <div class="w-12 h-12 rounded-full flex items-center justify-center font-label font-bold text-lg"
+         style="background:#2d3449; border:2px solid #4ae176; box-shadow:0 0 15px rgba(74,225,118,0.2); color:#4ae176">h1</div>
+    <span class="text-[10px] text-slate-500 font-label">Source</span>
+  </div>
+  <div class="flex-1 h-0.5 mx-2" style="background:linear-gradient(to right, #4ae176, #4ae176)">
+    <div class="w-2 h-2 rounded-full bg-primary mx-auto -mt-0.5" style="box-shadow:0 0 8px rgba(74,225,118,0.8)"></div>
+  </div>
+  <div class="flex flex-col items-center gap-2">
+    <div class="w-12 h-12 rounded-full flex items-center justify-center font-label font-bold text-lg"
+         style="background:#2d3449; border:2px solid #4ae176; box-shadow:0 0 15px rgba(74,225,118,0.2); color:#4ae176">h2</div>
+    <span class="text-[10px] text-slate-500 font-label">Target</span>
+  </div>
+</div>
+-->
