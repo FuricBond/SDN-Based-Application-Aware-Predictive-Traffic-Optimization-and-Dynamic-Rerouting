@@ -1,56 +1,105 @@
-# FlowSense SDN: Application-Aware Predictive Traffic Optimization and Dynamic Rerouting
+# SDN Traffic Optimizer
 
-## Overview
+An SDN traffic-engineering project built with Ryu, Mininet, OpenFlow 1.3, and Open vSwitch. The repository demonstrates topology-aware forwarding, port-stat monitoring, congestion detection, and dynamic rerouting across a multi-switch lab topology.
 
-FlowSense SDN is a software-defined networking project focused on intelligent traffic optimization in multi-switch OpenFlow environments. The system combines topology awareness, path computation, congestion monitoring, and controlled rerouting to demonstrate how an SDN controller can adapt forwarding behavior while preserving network stability.
+The main implementation lives in `controller/traffic_controller_advance.py`, which is the most feature-complete controller in the repo. A simpler baseline controller is also included for comparison and experimentation.
 
-This repository is designed for demonstration, experimentation, and academic or resume-ready presentation of SDN-based traffic engineering using Ryu and Mininet.
+## What This Project Does
 
-## Features
+- Learns host MAC locations across multiple OpenFlow switches
+- Discovers switch-to-switch links and access ports dynamically
+- Computes end-to-end paths through the topology
+- Installs forwarding rules hop by hop
+- Monitors port statistics to estimate link load
+- Detects congestion and predicts rising load from recent samples
+- Reroutes active flows onto an alternate path when it is meaningfully better
+- Includes a dashboard prototype for presenting the project visually
 
-- Topology-aware forwarding using discovered switches, links, and access ports
-- Dynamic path computation across a multi-switch Mininet topology
-- Congestion detection through OpenFlow port statistics
-- Traffic engineering with controlled rerouting and stability-first safeguards
-- Application-aware experimentation using `pingall` and `iperf`
-- Demo-friendly logging for rerouting and congestion visibility
+## Repository Layout
 
-## Tech Stack
+- `controller/traffic_controller_advance.py` - advanced controller with congestion-triggered rerouting and demo mode
+- `controller/traffic_controller.py` - baseline controller with dynamic path installation and simpler reroute logic
+- `topology/multi_switch_topology.py` - Mininet topology with four switches and two hosts
+- `Dashboard/stitch_sdn_traffic_optimizer_dashboard/` - static dashboard prototype and design assets
+- `screenshots/` - place demo screenshots and captures here
+- `requirements.txt` - Python dependency list currently tracked in the repo
 
-- Python
-- Ryu SDN Framework
+## Topology
+
+The provided Mininet topology creates:
+
+- 2 hosts: `h1`, `h2`
+- 4 OpenFlow 1.3 switches: `s1`, `s2`, `s3`, `s4`
+- 2 parallel host-to-host paths: `s1 -> s2 -> s4` and `s1 -> s3 -> s4`
+
+This parallel-path layout makes it easy to demonstrate path selection and rerouting behavior.
+
+## Controller Variants
+
+### `traffic_controller_advance.py`
+
+This is the recommended controller to run for demos. It adds:
+
+- controlled ARP flooding
+- topology refresh on switch and link events
+- periodic port-stats polling every 5 seconds
+- traffic history tracking per switch port
+- predicted congestion logging from recent load samples
+- reroute warmup and cooldown timers
+- alternate-path selection that avoids the congested link
+- demo mode that artificially boosts load on one link to make rerouting easier to observe
+
+### `traffic_controller.py`
+
+This version is a lighter implementation that still supports:
+
+- topology discovery
+- path computation
+- flow installation
+- link-load tracking
+- simpler alternate-path selection
+
+Use it if you want a smaller controller for learning or side-by-side comparison.
+
+## Prerequisites
+
+You will need these installed in your SDN lab environment:
+
+- Python 3
+- Ryu
 - Mininet
-- OpenFlow 1.3
 - Open vSwitch
+- OpenFlow 1.3-capable switches in Mininet
 
-## Project Structure
+The repo currently tracks only `ryu` in `requirements.txt`, so Mininet and Open vSwitch should be installed separately on the system where you run the demo.
 
-- `controller/` - Ryu controller implementations
-- `topology/` - Mininet topology definitions
-- `monitoring/` - monitoring-related components
-- `routing/` - routing and path-selection logic
-- `screenshots/` - demo images and output captures
-- `README.md` - project overview and usage guide
-- `.gitignore` - ignore rules for local artifacts
-- `requirements.txt` - Python dependencies
+## Setup
 
-## How to Run
+Install the Python dependency:
 
-Start the controller:
+```bash
+pip install -r requirements.txt
+```
+
+If Ryu is not available on your path after installation, use the Python environment where it is installed.
+
+## Run the Project
+
+Start the advanced controller:
 
 ```bash
 PYTHONPATH=. ryu-manager --observe-links controller/traffic_controller_advance.py
 ```
 
-In a separate terminal, start Mininet:
+In a second terminal, start Mininet with the custom topology:
 
 ```bash
 sudo mn --custom topology/multi_switch_topology.py --topo multiswitch --controller remote --switch ovsk,protocols=OpenFlow13 --link tc
 ```
 
-## Testing Steps
+## Demo Workflow
 
-Run the following from the Mininet CLI:
+From the Mininet CLI, a simple demo sequence is:
 
 ```bash
 pingall
@@ -59,30 +108,54 @@ h1 iperf -c 10.0.0.2 -t 20
 pingall
 ```
 
-Expected behavior:
+What to watch for in the controller logs:
 
-- `pingall` succeeds before traffic generation
-- `iperf` runs successfully between hosts
-- `pingall` remains stable after traffic generation
+- MAC learning events
+- datapath registration
+- per-port RX, TX, and computed load
+- `DEMO CONGESTION TRIGGERED`
+- `CONGESTION DETECTED`
+- `PREDICTED CONGESTION`
+- `REROUTING flow ...`
 
-## Demo Output
+Because the advanced controller enables `demo_mode`, it intentionally inflates load on one link to make congestion and rerouting visible during a short demo.
 
-Typical demo output includes congestion and rerouting logs such as:
+## Expected Behavior
 
-```text
-DEMO CONGESTION TRIGGERED
-REROUTING flow 00:00:00:00:00:01 -> 00:00:00:00:00:02 from path [1, 2, 4] to path [1, 3, 4]
-```
+- Initial connectivity should work with `pingall`
+- Flows should be installed after host learning completes
+- Port statistics should begin appearing once switches are registered
+- During sustained traffic, the controller should detect or predict congestion
+- If a valid alternate path has lower measured cost, the controller should reroute the active flow
 
-Add screenshots of Mininet output, controller logs, and rerouting behavior in the `screenshots/` directory.
+## Dashboard
 
-## Outcome
+The `Dashboard/stitch_sdn_traffic_optimizer_dashboard/` directory contains a static dashboard prototype for presenting the project. To view it locally, open:
 
-This project demonstrates a clean and practical SDN workflow for:
+- `Dashboard/stitch_sdn_traffic_optimizer_dashboard/index.html`
 
-- discovering network topology
-- computing forwarding paths
-- detecting congestion
-- shifting traffic safely when an alternate path is meaningfully better
+This dashboard is useful for demonstration and portfolio presentation, but it is not currently wired into the Ryu controller as a live monitoring frontend.
 
-The result is a professional, demo-friendly SDN project that is easy to understand, easy to run, and suitable for presentations, portfolios, and technical discussions.
+## Notes and Limitations
+
+- The controller logic is intended for a lab or demo environment, not production networking
+- Rerouting decisions are based on simple measured load and short traffic history windows
+- The advanced controller currently uses a demo congestion trigger to make behavior easier to observe
+- Empty directories such as `monitoring/`, `routing/`, and `tests/` are present but do not yet contain active implementation in this snapshot
+
+## Screenshots and Evidence
+
+You can store demo artifacts in `screenshots/`, such as:
+
+- Mininet CLI output
+- controller log captures
+- rerouting evidence
+- dashboard screenshots
+
+## Tech Stack
+
+- Python
+- Ryu
+- Mininet
+- Open vSwitch
+- OpenFlow 1.3
