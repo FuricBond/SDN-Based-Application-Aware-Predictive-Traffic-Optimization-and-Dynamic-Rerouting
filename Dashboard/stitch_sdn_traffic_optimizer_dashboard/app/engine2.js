@@ -27,6 +27,8 @@ function initEnhancementLayer() {
    SECTION 1 — NEW STATE FIELDS
    ================================================================ */
 const S = window.SDN_STATE;
+const PRIMARY_PATH_LINKS = ['edge01-coreA', 'coreA-distr1', 'distr1-end04'];
+const BACKUP_PATH_LINKS = ['edge01-coreB', 'coreB-distr2', 'distr2-end04'];
 // Extend state with new intelligence fields
 Object.assign(S, {
   activeFlows:    14,
@@ -742,8 +744,8 @@ function smartSimulate() {
   _s2 = setTimeout(() => {
     s.status       = 'REROUTING';
     s.rerouting    = true;
-    s.activePath   = [1, 2, 4];
-    s.oldPath      = [1, 3, 4];
+    s.activePath   = [...PRIMARY_PATH_LINKS];
+    s.oldPath      = [...BACKUP_PATH_LINKS];
     s.latency      = 15 + Math.random() * 8;
     s.confidence   = 94 + Math.random() * 4;
     s.rerouteCount += 1;
@@ -760,6 +762,8 @@ function smartSimulate() {
     s.status     = 'NORMAL';
     s.congestion = false;
     s.rerouting  = false;
+    s.activePath = [...PRIMARY_PATH_LINKS];
+    s.oldPath    = [...BACKUP_PATH_LINKS];
     s.load       = 18 + Math.random() * 12;
     s.latency    = 3 + Math.random() * 3;
     s.confidence = 97 + Math.random() * 2;

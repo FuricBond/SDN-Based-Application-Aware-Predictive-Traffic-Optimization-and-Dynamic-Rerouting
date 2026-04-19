@@ -33,17 +33,17 @@ const DEMO_STEPS = [
     badgeColor: '#4ae176',
     highlightSelector: '#page-dashboard .grid.grid-cols-12.gap-6.mb-6:first-of-type',
     explain:
-      'The SDN controller is operating normally. All 14 active flows are routed via the ' +
-      'optimal low-latency path h1→s1→s2→s4→h2. No intervention required.',
+      'The SDN controller is operating normally. h1 is sending traffic to h2 via the ' +
+      'optimal low-latency path h1→s1→s2→s4→h2. Flow table is synchronized. No intervention required.',
     logs: [
-      ['INFO',    'Baseline established. All nodes responding within SLA thresholds.'],
-      ['INFO',    'Flow table synchronized. Path [1→2→4] active. Latency: 4.2ms.'],
+      ['INFO',    '[INFO] Monitoring traffic on h1→s1→s2→s4→h2. All nodes responding within SLA thresholds.'],
+      ['INFO',    '[INFO] Flow table synchronized. 14 active flows. Latency: 4.2ms.'],
     ],
   },
   {
     id: 2,
     phase: 'DETECTION',
-    title: 'Load Rising on s3',
+    title: 'Congestion at s3',
     subtitle: 'Hardware root cause',
     page: 'hardware',
     state: 'CONGESTED',
@@ -52,16 +52,16 @@ const DEMO_STEPS = [
     highlightSelector: '#page-hardware',
     explain:
       'Hardware monitoring detects buffer saturation on switch s3 (port eth2). ' +
-      'Load exceeded 87% — the root cause of this congestion event.',
+      'Load exceeded 87% — the root cause of this congestion event. Path h1→s1→s3→s4→h2 is degraded.',
     logs: [
-      ['WARN',   'Switch s3-eth2 buffer at 87%. Approaching critical threshold.'],
-      ['ERROR',  'CRC errors rising on s3. CPU: 94%. Packet drops imminent.'],
+      ['WARN',   '[WARN] Congestion detected at s3 port eth2 — buffer at 87%, latency spike 38.4ms.'],
+      ['ERROR',  '[INFO] Evaluating alternate paths. Primary path h1→s1→s3→s4→h2 degraded.'],
     ],
   },
   {
     id: 3,
     phase: 'DETECTION',
-    title: 'Anomaly Flagged',
+    title: 'Anomaly Flagged at s3',
     subtitle: 'Security Sentinel active',
     page: 'security',
     state: 'CONGESTED',
@@ -69,12 +69,12 @@ const DEMO_STEPS = [
     badgeColor: '#eb4141',
     highlightSelector: '#page-security .col-span-12.lg\\:col-span-4',
     explain:
-      'The Security Sentinel detects an abnormal traffic spike from s3. ' +
+      'The Security Sentinel detects an abnormal traffic spike from switch s3. ' +
       '1,300+ suspicious events flagged. DDoS vector analysis initiated. ' +
-      'Alert escalated to Optimization Engine.',
+      'Alert escalated to the SDN controller Optimization Engine.',
     logs: [
-      ['WARN',   'Traffic spike detected at S3_NODE. Suspicious events: 1,300+.'],
-      ['ERROR',  'Anomaly confirmed. Security Sentinel escalating to controller.'],
+      ['WARN',   '[WARN] Traffic spike detected at switch s3 port eth2. Suspicious events: 1,300+.'],
+      ['ERROR',  '[INFO] Anomaly confirmed. Security Sentinel escalating to controller.'],
     ],
   },
   {
@@ -88,12 +88,12 @@ const DEMO_STEPS = [
     badgeColor: '#f59e0b',
     highlightSelector: '#page-optimization section.lg\\:col-span-5',
     explain:
-      'The SDN controller evaluates 3 candidate paths. Decision Score: 94/100. ' +
-      'Path [1→2→4] selected — lowest latency, sufficient capacity. ' +
-      'Validation: Hysteresis ✔  Cooldown ✔.',
+      'The SDN controller evaluates candidate paths. Decision Score: 94/100. ' +
+      'Path [h1,s1,s2,s4,h2] selected — lowest latency (18.2ms), sufficient capacity. ' +
+      'Old path [h1,s1,s3,s4,h2] deprecated. Validation: Hysteresis ✔ Cooldown ✔.',
     logs: [
-      ['EXEC',   'Controller computing alternate path. Evaluating 3 path candidates.'],
-      ['EXEC',   'Path [1→2→4] selected. Decision Score: 94. Validation: PASS.'],
+      ['EXEC',   '[INFO] Evaluating alternate paths. s3 congested — switching to s2 path.'],
+      ['EXEC',   '[EXEC] Rerouting via s2. Path [h1,s1,s2,s4,h2] selected. Decision Score: 94. Validation: PASS.'],
     ],
   },
   {
@@ -107,12 +107,12 @@ const DEMO_STEPS = [
     badgeColor: '#f59e0b',
     highlightSelector: '#page-topology section.lg\\:col-span-8',
     explain:
-      'Traffic is being redirected from the congested path [1→3→4] to the new path [1→2→4]. ' +
-      'Old path shown as dashed gray. Active path glows green. ' +
-      's3 node blinks red — isolated from active flow.',
+      'Traffic is being redirected from the congested path [h1,s1,s3,s4,h2] to [h1,s1,s2,s4,h2]. ' +
+      'The s1–s3 and s3–s4 links fade from red to grey-dashed. The new active path h1→s1→s2→s4→h2 ' +
+      'lights up green. s3 fades out. Watch the 550ms transition — the controller rerouted live.',
     logs: [
-      ['EXEC',   'Rerouting path [1→2→4] deployed. Old path [1→3→4] deprecated.'],
-      ['EXEC',   'Flow table updated on controller. 9 flows migrated to backup path.'],
+      ['EXEC',   '[EXEC] Rerouting via s2. Path [h1→s1→s2→s4→h2] deployed. Old path [h1→s1→s3→s4→h2] deprecated.'],
+      ['EXEC',   '[EXEC] Flow table updated on controller. 9 flows migrated to s2 path.'],
     ],
   },
   {
@@ -126,12 +126,12 @@ const DEMO_STEPS = [
     badgeColor: '#4ae176',
     highlightSelector: '#page-dashboard',
     explain:
-      'Rerouting complete. Latency restored to 4.2ms. All 14 flows stable. ' +
-      'The system has autonomously detected, decided, and resolved the congestion ' +
-      'event in under 9 seconds — with zero manual intervention.',
+      'Rerouting complete. Traffic is now flowing via h1→s1→s2→s4→h2. Latency restored to 4.2ms. ' +
+      'All 14 flows stable. The SDN controller detected, decided, and resolved the s3 congestion event ' +
+      'in under 9 seconds — with zero manual intervention.',
     logs: [
-      ['SUCCESS', 'System restored. Latency: 4.2ms. Path [1→2→4] stable.'],
-      ['INFO',    'Post-reroute health check complete. All nodes operational.'],
+      ['SUCCESS', '[SUCCESS] Traffic stabilized. Path [h1→s1→s2→s4→h2] active. Latency: 4.2ms.'],
+      ['INFO',    '[INFO] Post-reroute health check complete. All nodes operational. s3 cleared.'],
     ],
   },
 ];
@@ -157,6 +157,9 @@ const TOOLTIPS = [
   { sel: '#sdn-timeline',                           tip: 'Live state machine: tracks the system through Normal → Congestion → Rerouting → Stable' },
   { sel: '#heatmap-grid',                           tip: 'Per-port latency heatmap: green=normal, red=critical. Click a cell for port details' },
 ];
+
+const PRIMARY_PATH_LINKS = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
+const BACKUP_PATH_LINKS  = ['h1-s1', 's1-s3', 's3-s4', 's4-h2'];
 
 function initDemoLayer() {
 
@@ -482,6 +485,55 @@ panel.innerHTML = `
 document.body.appendChild(panel);
 
 /* ================================================================
+   SECTION 3b — INJECT FLOW TRACKER BAR
+   ================================================================ */
+(function injectFlowTracker() {
+  if (document.getElementById('sdn-flow-tracker')) return;
+  // Flow phases: label, tracker-class suffix, step indices (0-indexed)
+  const phases = [
+    { label: 'Normal',     cls: '',           steps: [0] },
+    { label: 'Congestion', cls: 'fs-congested', steps: [1] },
+    { label: 'Detection',  cls: 'fs-congested', steps: [2] },
+    { label: 'Decision',   cls: 'fs-rerouting', steps: [3] },
+    { label: 'Rerouting',  cls: 'fs-rerouting', steps: [4] },
+    { label: 'Stable',     cls: 'fs-stable',    steps: [5] },
+  ];
+  const tracker = document.createElement('div');
+  tracker.id = 'sdn-flow-tracker';
+  tracker.innerHTML = phases.map((p, i) =>
+    (i > 0 ? '<span class="flow-sep">›</span>' : '') +
+    `<div class="flow-step" id="ft-step-${i}">${p.label}</div>`
+  ).join('');
+  document.body.appendChild(tracker);
+  // Store phase config for updater
+  tracker._phases = phases;
+})();
+
+function updateFlowTracker(currentStepIdx) {
+  const tracker = document.getElementById('sdn-flow-tracker');
+  if (!tracker) return;
+  const phases = tracker._phases || [
+    { steps: [0] }, { steps: [1] }, { steps: [2] },
+    { steps: [3] }, { steps: [4] }, { steps: [5] },
+  ];
+  const colorMap = [
+    '', 'fs-congested', 'fs-congested', 'fs-rerouting', 'fs-rerouting', 'fs-stable'
+  ];
+  phases.forEach((p, i) => {
+    const el = document.getElementById(`ft-step-${i}`);
+    if (!el) return;
+    const stepIdx = p.steps[0];
+    el.className = 'flow-step';
+    if (currentStepIdx > stepIdx) {
+      el.classList.add('fs-done');
+    } else if (currentStepIdx === stepIdx) {
+      el.classList.add('fs-active');
+      if (colorMap[i]) el.classList.add(colorMap[i]);
+    }
+  });
+}
+
+/* ================================================================
    SECTION 3 — BUILD EXPLANATION OVERLAY
    ================================================================ */
 const overlay = document.createElement('div');
@@ -655,33 +707,78 @@ function runStep(stepIdx, opts = {}) {
   const step = DEMO_STEPS[stepIdx];
   const S = window.SDN_STATE;
 
-  /* Navigate to correct page */
-  if (typeof window.SDN?.navigate === 'function') window.SDN.navigate(step.page);
+  /* ---- 1. Apply exact state for EACH step ---- */
+  if (stepIdx === 0) {
+    // STEP 1: NORMAL — full system baseline
+    S.status = 'NORMAL';  S.congestion = false; S.rerouting = false;
+    S.congestedNode = null; S._lastTopoStatus = null; // force topology log refresh
+    S.activePath = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
+    S.oldPath    = ['h1-s1', 's1-s3', 's3-s4', 's4-h2'];
+    S.load = 24;  S.latency = 4.2;  S.confidence = 98.4; S._simRunning = false;
 
-  /* Apply state */
-  if (step.state === 'NORMAL' && S.status !== 'NORMAL') {
-    S.status = 'NORMAL'; S.congestion = false; S.rerouting = false;
-    S.load = 24; S.latency = 4.2; S.confidence = 98.4; S._simRunning = false;
-  } else if (step.state === 'CONGESTED' && S.status !== 'CONGESTED') {
+  } else if (stepIdx === 1) {
+    // STEP 2: CONGESTION detected at s3
     S.status = 'CONGESTED'; S.congestion = true; S.rerouting = false;
+    S.congestedNode = 's3'; S._lastTopoStatus = null;
+    S.activePath = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
     S.load = 87; S.latency = 38.4; S.confidence = 91.2;
-    S._graphHistory.push(91); S._graphHistory.shift();
-    S._graphCurrent = [...S._graphHistory];
-  } else if (step.state === 'REROUTING') {
+    S._graphHistory.push(87); S._graphHistory.shift();
+
+  } else if (stepIdx === 2) {
+    // STEP 3: DETECTION — security anomaly flagged (still congested state)
+    S.status = 'CONGESTED'; S.congestion = true; S.rerouting = false;
+    S.congestedNode = 's3';
+    S.load = 87; S.latency = 38.4; S.confidence = 91.2;
+    S.suspiciousActivity = 1284;
+
+  } else if (stepIdx === 3) {
+    // STEP 4: DECISION — controller evaluating (still congested, decision in progress)
+    S.status = 'CONGESTED'; S.congestion = true; S.rerouting = false;
+    S.congestedNode = 's3';
+    S.load = 87; S.latency = 38.4; S.confidence = 94.0; // confidence rises
+
+  } else if (stepIdx === 4) {
+    // STEP 5: REROUTING — path switch executing
     S.status = 'REROUTING'; S.rerouting = true; S.congestion = true;
-    S.activePath = [1,2,4]; S.oldPath = [1,3,4];
+    S.activePath = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
+    S.oldPath    = ['h1-s1', 's1-s3', 's3-s4', 's4-h2'];
+    S.congestedNode = 's3'; S._lastTopoStatus = null;
     S.load = 42; S.latency = 18.2; S.confidence = 96.7;
     S.rerouteCount += 1;
+    S._graphHistory.push(42); S._graphHistory.shift();
+
+  } else if (stepIdx === 5) {
+    // STEP 6: STABLE — rerouting complete
+    S.status = 'NORMAL'; S.congestion = false; S.rerouting = false;
+    S.congestedNode = null; S._lastTopoStatus = null;
+    S.activePath = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
+    S.oldPath    = ['h1-s1', 's1-s3', 's3-s4', 's4-h2'];
+    S.load = 24; S.latency = 4.2; S.confidence = 98.8; S._simRunning = false;
+    S._graphHistory.push(28); S._graphHistory.shift();
   }
+
+  /* ---- 2. Navigate to correct page FIRST ---- */
+  if (typeof window.SDN?.navigate === 'function') window.SDN.navigate(step.page);
+
+  /* ---- 3. Update all UI modules ---- */
   if (typeof window.updateUI === 'function') window.updateUI();
 
-  /* Highlight module */
+  /* ---- 4. Force topology update AFTER page render (topology SVG must be visible) ---- */
+  const topoDelay = step.page === 'topology' ? 120 : 0;
+  setTimeout(() => {
+    if (typeof window.updateTopology === 'function') window.updateTopology();
+  }, topoDelay);
+
+  /* ---- 5. Update flow tracker bar ---- */
+  updateFlowTracker(stepIdx);
+
+  /* ---- 6. Highlight module ---- */
   highlightModule(step);
 
-  /* Show explanation overlay */
+  /* ---- 7. Show explanation overlay ---- */
   showExplainOverlay(step);
 
-  /* Update demo panel */
+  /* ---- 8. Update demo panel ---- */
   const badge = document.getElementById('demo-step-badge');
   if (badge) {
     badge.textContent       = step.badgeTxt;
@@ -699,7 +796,7 @@ function runStep(stepIdx, opts = {}) {
   updatePips();
   updateNextBtn(step);
 
-  /* Fire narrative logs */
+  /* ---- 9. Fire narrative logs ---- */
   if (!opts.silent) {
     step.logs.forEach((([lvl, txt], i) => {
       setTimeout(() => {
@@ -709,7 +806,7 @@ function runStep(stepIdx, opts = {}) {
     }));
   }
 
-  /* Prev button state */
+  /* ---- 10. Prev button state ---- */
   const prevBtn = document.getElementById('btn-demo-prev');
   if (prevBtn) prevBtn.style.opacity = stepIdx === 0 ? '0.3' : '1';
 }
@@ -718,10 +815,13 @@ function startDemo() {
   _demoActive = true;
   document.getElementById('demo-start-banner').style.display = 'none';
   document.getElementById('demo-active-ui').style.display   = 'block';
+  // Show flow tracker bar
+  const tracker = document.getElementById('sdn-flow-tracker');
+  if (tracker) tracker.style.display = 'flex';
   buildPips();
   runStep(0);
   if (typeof window.SDN?.storyLog === 'function') {
-    window.SDN.storyLog('INFO', 'Guided Demo started. Step 1/6: System Monitoring.');
+    window.SDN.storyLog('INFO', '[INFO] Guided Demo started. Step 1/6: System Monitoring — path h1→s1→s2→s4→h2 active.');
   }
 }
 
@@ -745,6 +845,9 @@ function resetDemo() {
   // Reset state
   const S = window.SDN_STATE;
   S.status = 'NORMAL'; S.congestion = false; S.rerouting = false;
+  S.activePath = [...PRIMARY_PATH_LINKS];
+  S.oldPath    = [...BACKUP_PATH_LINKS];
+  S.congestedNode = null;
   S.load = 24; S.latency = 4.2; S.confidence = 98.4; S._simRunning = false;
   if (typeof window.updateUI === 'function') window.updateUI();
   if (typeof window.SDN?.navigate === 'function') window.SDN.navigate('dashboard');
@@ -756,7 +859,11 @@ function resetDemo() {
   document.getElementById('demo-active-ui').style.display    = 'none';
   document.getElementById('sdn-explain-overlay').style.display = 'none';
 
-  if (typeof window.SDN?.storyLog === 'function') window.SDN.storyLog('INFO', 'Demo reset. System restored to NORMAL state.');
+  // Hide flow tracker bar
+  const tracker = document.getElementById('sdn-flow-tracker');
+  if (tracker) { tracker.style.display = 'none'; updateFlowTracker(-1); }
+
+  if (typeof window.SDN?.storyLog === 'function') window.SDN.storyLog('INFO', '[INFO] Demo reset. System restored to NORMAL state. Path h1→s1→s2→s4→h2 active.');
 }
 
 /* Auto mode */

@@ -424,54 +424,89 @@
           <span class="font-label text-xs tracking-wider uppercase">Live Topology Canvas</span>
         </div>
 
-        <!-- TOPOLOGY SVG — Coordinates PRESERVED. Only CSS variables updated. -->
+        <!-- TOPOLOGY SVG — Geometry PRESERVED. State driven by engine.js via data-attributes. -->
+        <!-- Mininet topology: h1 — s1 — s2 — s4 — h2  (primary path) -->
+        <!--                              |           |                  -->
+        <!--                              s3 ─────────                  -->
         <div class="relative flex-1 flex items-center justify-center">
           <svg class="w-full h-full p-12 overflow-visible" viewBox="0 0 800 400">
-            <!-- Active Path links -->
-            <path class="neon-pulse" d="M100 200 L300 100"
-                  stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
-            <!-- Congested link -->
-            <path class="error-pulse" d="M100 200 L300 300"
-                  stroke="var(--node-critical)" stroke-width="4"/>
-            <path class="neon-pulse" d="M300 100 L500 100"
-                  stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
-            <path d="M300 300 L500 300"
-                  stroke="var(--node-standby)" stroke-width="2"/>
-            <path class="neon-pulse" d="M500 100 L700 200"
-                  stroke="var(--active-path-color)" stroke-dasharray="10 5" stroke-width="3"/>
-            <path d="M500 300 L700 200"
-                  stroke="var(--node-standby)" stroke-width="2"/>
 
-            <!-- EDGE_01 -->
-            <g transform="translate(100, 200)">
-              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
-              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">EDGE_01</text>
+            <!-- PRIMARY PATH LINKS (h1 → s1 → s2 → s4 → h2) -->
+            <!-- h1 → s1 -->
+            <path data-link="h1-s1"
+                  class="active"
+                  d="M100 200 L270 200"
+                  fill="none"/>
+
+            <!-- s1 → s2 (primary, upper) -->
+            <path data-link="s1-s2"
+                  class="active"
+                  d="M320 200 L470 130"
+                  fill="none"/>
+
+            <!-- s2 → s4 -->
+            <path data-link="s2-s4"
+                  class="active"
+                  d="M530 130 L630 200"
+                  fill="none"/>
+
+            <!-- s4 → h2 -->
+            <path data-link="s4-h2"
+                  class="active"
+                  d="M680 200 L740 200"
+                  fill="none"/>
+
+            <!-- ALTERNATE PATH LINKS (s1 → s3 → s4 — when congestion reroutes here) -->
+            <!-- s1 → s3 (lower branch) -->
+            <path data-link="s1-s3"
+                  class="standby"
+                  d="M320 200 L470 290"
+                  fill="none"/>
+
+            <!-- s3 → s4 -->
+            <path data-link="s3-s4"
+                  class="standby"
+                  d="M530 290 L630 200"
+                  fill="none"/>
+
+            <!-- NODES: data-node attributes match real Mininet host/switch names -->
+
+            <!-- h1 — SOURCE HOST -->
+            <g data-node="h1" transform="translate(100, 200)">
+              <circle class="active" r="24" stroke-width="2"/>
+              <text class="active" dy=".3em" font-family="Space Grotesk" font-size="11" font-weight="700" text-anchor="middle">h1</text>
             </g>
-            <!-- CORE_A -->
-            <g transform="translate(300, 100)">
-              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
-              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">CORE_A</text>
+
+            <!-- s1 — SWITCH 1 (hub node) -->
+            <g data-node="s1" transform="translate(295, 200)">
+              <circle class="active" r="24" stroke-width="2"/>
+              <text class="active" dy=".3em" font-family="Space Grotesk" font-size="11" font-weight="700" text-anchor="middle">s1</text>
             </g>
-            <!-- CORE_B (Error state) -->
-            <g transform="translate(300, 300)">
-              <circle class="error-pulse" fill="var(--tertiary-container)" r="24" stroke="var(--node-critical)" stroke-width="2"/>
-              <text dy=".3em" fill="var(--node-critical)" font-family="Space Grotesk" font-size="10" text-anchor="middle">CORE_B</text>
+
+            <!-- s2 — SWITCH 2 (primary path, upper) -->
+            <g data-node="s2" transform="translate(500, 130)">
+              <circle class="active" r="24" stroke-width="2"/>
+              <text class="active" dy=".3em" font-family="Space Grotesk" font-size="11" font-weight="700" text-anchor="middle">s2</text>
             </g>
-            <!-- DISTR_1 -->
-            <g transform="translate(500, 100)">
-              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
-              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">DISTR_1</text>
+
+            <!-- s3 — SWITCH 3 (alternate / congested branch) -->
+            <g data-node="s3" transform="translate(500, 290)">
+              <circle class="standby" r="24" stroke-width="2"/>
+              <text class="standby" dy=".3em" font-family="Space Grotesk" font-size="11" font-weight="700" text-anchor="middle">s3</text>
             </g>
-            <!-- DISTR_2 (Standby) -->
-            <g transform="translate(500, 300)">
-              <circle fill="var(--surface-base)" r="24" stroke="var(--node-standby)" stroke-width="2"/>
-              <text dy=".3em" fill="var(--outline)" font-family="Space Grotesk" font-size="10" text-anchor="middle">DISTR_2</text>
+
+            <!-- s4 — SWITCH 4 (merger point) -->
+            <g data-node="s4" transform="translate(655, 200)">
+              <circle class="active" r="24" stroke-width="2"/>
+              <text class="active" dy=".3em" font-family="Space Grotesk" font-size="11" font-weight="700" text-anchor="middle">s4</text>
             </g>
-            <!-- END_04 -->
-            <g transform="translate(700, 200)">
-              <circle class="neon-pulse" fill="var(--surface-base)" r="24" stroke="var(--active-path-color)" stroke-width="2"/>
-              <text dy=".3em" fill="var(--active-path-color)" font-family="Space Grotesk" font-size="10" text-anchor="middle">END_04</text>
+
+            <!-- h2 — TARGET HOST -->
+            <g data-node="h2" transform="translate(760, 200)">
+              <circle class="active" r="24" stroke-width="2"/>
+              <text class="active" dy=".3em" font-family="Space Grotesk" font-size="11" font-weight="700" text-anchor="middle">h2</text>
             </g>
+
           </svg>
         </div>
 
@@ -701,14 +736,22 @@
         <div class="flex justify-between items-center mb-8">
           <h3 class="font-label text-xs uppercase tracking-widest text-secondary">Link Load Trend</h3>
         </div>
-        <div class="flex items-end justify-between h-48 gap-3 pb-8">
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:65%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">08:00</span></div>
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:45%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">09:00</span></div>
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:85%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">10:00</span></div>
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:72%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">11:00</span></div>
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl bg-primary" style="height:92%"></div><span class="absolute text-[9px] font-label text-primary font-bold" style="bottom:-20px;left:50%;transform:translateX(-50%)">12:00</span></div>
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:55%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">13:00</span></div>
-          <div class="w-full rounded-t-xl relative chart-bar" style="background:rgba(63,70,92,0.2)"><div class="absolute bottom-0 w-full rounded-t-xl" style="background:rgba(74,225,118,0.4);height:30%"></div><span class="absolute text-[9px] font-label text-on-surface-variant" style="bottom:-20px;left:50%;transform:translateX(-50%)">14:00</span></div>
+        <!-- Link Load canvas — drawn by app/chart.js, driven by SDN_STATE -->
+        <div style="position:relative;height:192px;width:100%">
+          <canvas id="link-load-canvas"
+                  style="display:block;width:100%;height:100%;border-radius:10px"></canvas>
+          <!-- Live value badge (top-right corner) -->
+          <div style="position:absolute;top:0;right:0;display:flex;align-items:center;gap:6px;
+                      padding:4px 10px;border-radius:0 10px 0 10px;
+                      background:rgba(11,19,38,0.7);backdrop-filter:blur(8px)">
+            <span id="chart-live-dot"
+                  style="width:6px;height:6px;border-radius:50%;background:#4ae176;
+                         box-shadow:0 0 6px #4ae176;display:inline-block"></span>
+            <span id="chart-live-val"
+                  class="font-mono text-[10px] font-bold"
+                  style="color:#4ae176">24%</span>
+            <span class="text-[9px] font-label" style="color:#334155">LOAD</span>
+          </div>
         </div>
       </section>
       <!-- Controller Decision -->
@@ -717,13 +760,13 @@
         <div class="space-y-4">
           <div class="p-4 rounded-xl" style="background:#060e20;border-left:4px solid #4ae176">
             <p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Primary Reason</p>
-            <p class="text-sm font-medium">Congestion at Edge Node 04 exceeds threshold (85%).</p>
+            <p class="text-sm font-medium">High load detected on switch s3 port eth2 (&gt;85% utilization).</p>
           </div>
           <div class="solid-card p-4 rounded-xl">
             <p class="text-[10px] text-on-surface-variant font-label uppercase mb-1">Action Executed</p>
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-primary text-sm">swap_horiz</span>
-              <p class="text-sm font-medium">Re-balance flow 8821 to backup fiber.</p>
+              <p class="text-sm font-medium">Rerouted traffic from [h1,s1,s3,s4,h2] to [h1,s1,s2,s4,h2].</p>
             </div>
           </div>
           <div class="flex items-center justify-between mt-6">
@@ -744,9 +787,9 @@
           <button class="text-[10px] text-primary hover:underline font-label uppercase">Export CSV</button>
         </div>
         <div class="space-y-2 overflow-y-auto max-h-48 pr-2">
-          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:44:02]</span><span class="flex-1">Link integrity check passed: Node_FR_02</span><span class="text-[10px] text-slate-500">STATUS_OK</span></div>
-          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:43:55]</span><span class="flex-1">Triggering predictive reroute for flow ID:9920</span><span class="text-[10px] text-primary font-bold">EXECUTING</span></div>
-          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:42:10]</span><span class="flex-1">ML Model updated: v2.4.1 weights initialized</span><span class="text-[10px] text-slate-500">SYS_UPDATE</span></div>
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:44:02]</span><span class="flex-1">Link integrity check passed: s1–s2 and s2–s4</span><span class="text-[10px] text-slate-500">STATUS_OK</span></div>
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:43:55]</span><span class="flex-1">Triggering reroute: s3 congested — switching to s2 path</span><span class="text-[10px] text-primary font-bold">EXECUTING</span></div>
+          <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs text-on-surface-variant" style="background:rgba(23,31,51,0.4)"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(74,225,118,0.6)">[12:42:10]</span><span class="flex-1">Flow table updated on controller. Path [h1,s1,s2,s4,h2] active.</span><span class="text-[10px] text-slate-500">STABLE</span></div>
           <div class="flex items-center justify-between p-3 rounded-xl font-label text-xs" style="background:rgba(57,0,3,0.2);color:#eb4141"><span class="w-24 shrink-0 font-mono text-[10px]" style="color:rgba(235,65,65,0.6)">[12:40:01]</span><span class="flex-1">Packet loss anomaly detected at Core_SW_01</span><span class="text-[10px] font-bold">WARNING</span></div>
         </div>
       </section>
@@ -1207,6 +1250,13 @@ window.SDN = {
   Graph, Topology Story, Smart Simulate, Story Logs
   ===================================================== -->
 <script src="app/engine2.js"></script>
+
+<!-- =====================================================
+  LINK LOAD TREND CHART — Canvas-based, driven by SDN_STATE
+  Loaded after engine so SDN_STATE and updateUI exist.
+  Registers window.initChart / window.updateChart.
+  ===================================================== -->
+<script src="app/chart.js"></script>
 
 <!-- =====================================================
   DEMO & PRESENTATION LAYER v1.0

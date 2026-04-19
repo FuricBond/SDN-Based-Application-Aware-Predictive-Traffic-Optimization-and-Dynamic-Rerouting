@@ -249,13 +249,114 @@ body {
   transition: all 0.2s ease;
 }
 
-/* === TOPOLOGY SVG (preserved) === */
+/* === TOPOLOGY SVG (preserved geometry) === */
 .topo-link-active  { stroke: var(--active-path-color); }
 .topo-link-error   { stroke: var(--node-critical); }
 .topo-link-standby { stroke: var(--node-standby); }
 .topo-node-active  { fill: var(--surface-base); stroke: var(--active-path-color); }
 .topo-node-error   { fill: var(--tertiary-container); stroke: var(--node-critical); }
 .topo-node-standby { fill: var(--surface-base); stroke: var(--node-standby); }
+
+/* === TOPOLOGY DYNAMIC STATE CLASSES (engine.js controlled) ===
+   Applied via JS to [data-link] and [data-node] elements.
+   NO inline styles for dynamic logic — CSS classes only.
+   =================================================== */
+
+/* Link states */
+[data-link] {
+  transition: stroke 0.5s ease, filter 0.5s ease, stroke-dasharray 0.4s ease, opacity 0.5s ease;
+}
+[data-link].active {
+  stroke: #4ae176 !important;
+  filter: drop-shadow(0 0 8px #4ae176);
+  stroke-dasharray: 10 5;
+  stroke-width: 3;
+  opacity: 1;
+}
+[data-link].congested {
+  stroke: #eb4141 !important;
+  filter: drop-shadow(0 0 10px #eb4141);
+  stroke-dasharray: none;
+  stroke-width: 4;
+  opacity: 1;
+  animation: pulse-link-error 1s ease-in-out infinite;
+}
+[data-link].standby {
+  stroke: #45464d !important;
+  filter: none;
+  stroke-dasharray: none;
+  stroke-width: 2;
+  opacity: 0.5;
+}
+/* old-path: shown as grey dashed DURING rerouting to indicate deprecated path */
+[data-link].old-path {
+  stroke: #45464d !important;
+  filter: none;
+  stroke-dasharray: 6 6;
+  stroke-width: 2;
+  opacity: 0.35;
+  transition: all 0.6s ease;
+}
+[data-link].rerouting {
+  stroke: #f59e0b !important;
+  filter: drop-shadow(0 0 8px #f59e0b);
+  stroke-dasharray: 10 5;
+  stroke-width: 3;
+  opacity: 1;
+  animation: pulse-link-reroute 1.5s ease-in-out infinite;
+}
+
+/* Node states — applied to <circle> inside [data-node] <g> */
+[data-node] circle.active {
+  stroke: #4ae176 !important;
+  fill: #0b1326 !important;
+  filter: drop-shadow(0 0 8px #4ae176);
+}
+[data-node] circle.congested {
+  stroke: #eb4141 !important;
+  fill: #390003 !important;
+  filter: drop-shadow(0 0 12px #eb4141);
+  animation: pulse-node-error 1s ease-in-out infinite;
+}
+[data-node] circle.standby {
+  stroke: #45464d !important;
+  fill: #0b1326 !important;
+  filter: none;
+}
+[data-node] circle.rerouting {
+  stroke: #f59e0b !important;
+  fill: #1a1200 !important;
+  filter: drop-shadow(0 0 10px #f59e0b);
+}
+
+/* Node text states */
+[data-node] text.active    { fill: #4ae176 !important; }
+[data-node] text.congested { fill: #eb4141 !important; }
+[data-node] text.standby   { fill: #909097 !important; }
+[data-node] text.rerouting { fill: #f59e0b !important; }
+
+/* Node circle transitions */
+[data-node] circle {
+  transition: stroke 0.5s ease, fill 0.5s ease, filter 0.5s ease;
+}
+
+/* Keyframe: congested link pulse */
+@keyframes pulse-link-error {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+/* Keyframe: rerouting link pulse */
+@keyframes pulse-link-reroute {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+/* Keyframe: congested node pulse */
+@keyframes pulse-node-error {
+  0%, 100% { filter: drop-shadow(0 0 12px #eb4141); }
+  50%       { filter: drop-shadow(0 0 4px #eb4141); }
+}
 
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
@@ -281,3 +382,72 @@ body {
 
 /* === SELECTION COLOR === */
 ::selection { background: rgba(74, 225, 118, 0.2); color: #4ae176; }
+
+/* ================================================================
+   FLOW TRACKER BAR (injected by demo.js at top of viewport)
+   ================================================================ */
+#sdn-flow-tracker {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 8800;
+  height: 44px;
+  background: rgba(6, 14, 32, 0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(69, 70, 77, 0.15);
+  display: none; /* shown only during demo */
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: opacity 0.3s ease;
+}
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #334155;
+  border: 1px solid transparent;
+  transition: all 0.35s ease;
+  white-space: nowrap;
+}
+.flow-step.fs-done {
+  color: #4ae176;
+  border-color: rgba(74, 225, 118, 0.2);
+  background: rgba(74, 225, 118, 0.07);
+}
+.flow-step.fs-active {
+  color: #fff;
+  border-color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 0 12px rgba(255,255,255,0.06);
+}
+.flow-step.fs-active.fs-congested  { color: #eb4141; border-color: rgba(235,65,65,0.3);   background: rgba(235,65,65,0.08);   box-shadow: 0 0 14px rgba(235,65,65,0.12); }
+.flow-step.fs-active.fs-rerouting  { color: #f59e0b; border-color: rgba(245,158,11,0.3);  background: rgba(245,158,11,0.08);  box-shadow: 0 0 14px rgba(245,158,11,0.12); }
+.flow-step.fs-active.fs-stable     { color: #4ae176; border-color: rgba(74,225,118,0.3);  background: rgba(74,225,118,0.10);  box-shadow: 0 0 14px rgba(74,225,118,0.15); }
+.flow-sep { color: #1e293b; font-size: 12px; user-select: none; }
+
+/* S3 alert badge shown in dashboard path strip during congestion */
+#s3-alert-badge {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(235, 65, 65, 0.12);
+  color: #eb4141;
+  border: 1px solid rgba(235, 65, 65, 0.25);
+  animation: pulse-node-error 1s ease-in-out infinite;
+  margin-top: 8px;
+}
+#s3-alert-badge.visible { display: flex; }

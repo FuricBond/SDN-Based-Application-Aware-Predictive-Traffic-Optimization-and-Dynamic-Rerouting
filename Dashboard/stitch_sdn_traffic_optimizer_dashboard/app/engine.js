@@ -16,8 +16,12 @@ window.SDN_STATE = {
   status:          'NORMAL',   // 'NORMAL' | 'CONGESTED' | 'REROUTING'
   congestion:      false,
   rerouting:       false,
-  activePath:      [1, 2, 4], // node indices: EDGE_01→CORE_A→DISTR_1→END_04
-  oldPath:         [1, 3, 4], // EDGE_01→CORE_B→DISTR_2→END_04
+  // activePath: real Mininet link IDs on the active forwarding path
+  activePath:      ['h1-s1', 's1-s2', 's2-s4', 's4-h2'],
+  // oldPath: alternate path through s3 (congested branch)
+  oldPath:         ['h1-s1', 's1-s3', 's3-s4', 's4-h2'],
+  // congestedNode: data-node ID of the congested switch (null when NORMAL)
+  congestedNode:   null,
   affectedSwitch:  's3',
   load:            24,         // %
   packetLoss:      0.02,       // %
@@ -27,7 +31,21 @@ window.SDN_STATE = {
   suspiciousActivity: 1284,
   throughput:      8.2,        // Gbps
   _simRunning:     false,
-  _graphHistory:   [65, 45, 85, 72, 92, 55, 30], // initial bar heights
+  _graphHistory:   [65, 45, 85, 72, 92, 55, 30],
+};
+
+/* ================================================================
+   NODE MAP — Maps Mininet identifiers to topology data-node IDs.
+   Since we now use real names everywhere, this is a direct 1:1 map.
+   Kept as a lookup table for engine.js consumers.
+   ================================================================ */
+window.NODE_MAP = {
+  h1: 'h1',   // source host
+  s1: 's1',   // switch 1 (hub)
+  s2: 's2',   // switch 2 (primary path)
+  s3: 's3',   // switch 3 (alternate / congested)
+  s4: 's4',   // switch 4 (merger)
+  h2: 'h2',   // destination host
 };
 
 /* ================================================================
@@ -41,7 +59,10 @@ function updateUI() {
   updateHardware();
   updateSidebar();
   _updateNavbarChip();
+  if (window.updateChart) window.updateChart(); // Link Load Trend canvas (chart.js)
 }
+window.updateUI       = updateUI;       // consumed by demo.js
+window.updateTopology = updateTopology; // consumed by demo.js runStep()
 
 /* ================================================================
    3. DASHBOARD UPDATER
@@ -109,64 +130,169 @@ function updateDashboard() {
   _updateDashPathStrip();
 }
 
-/* Animate the h1→s1→s2→s4→h2 strip based on activePath */
+/* Animate the h1→s1→s2→s4→h2 strip based on state */
 function _updateDashPathStrip() {
   const s = window.SDN_STATE;
-  // The strip nodes are: h1(src), s1, s2, s4, h2(tgt)
-  // activePath uses indices: 1=s1, 2=s2, 3=s3(CORE_B), 4=s4
-  const nodeEls = document.querySelectorAll('#page-dashboard .flex.items-center.justify-between.px-2.py-6 > div');
-  const connEls = document.querySelectorAll('#page-dashboard .flex.items-center.justify-between.px-2.py-6 > div.flex-1');
-  // Highlight s2 path (idx 1 in strip = s1, idx 2 = s2, idx 3 = s4)
   const isCongest = s.status === 'CONGESTED';
-  const isReroute = s.rerouting;
-  // s2 node (index 2 in strip) warns when congested via path 1,3
+  // Strip node order: h1(0) — s1(1) — s2(2) — s4(3) — h2(4)
+  const nodeEls = document.querySelectorAll('#page-dashboard .flex.items-center.justify-between.px-2.py-6 > div');
   nodeEls.forEach((n, i) => {
     const circle = n.querySelector('div');
     if (!circle) return;
-    if (isCongest && i === 2) { // s2 in congested state
-      circle.style.borderColor = '#f59e0b';
-      circle.style.color       = '#f59e0b';
-      circle.style.boxShadow   = '0 0 12px rgba(245,158,11,0.3)';
-    } else if (i === 0 || i === 4) { // h1, h2 always green
+    if (i === 0 || i === 4) { // h1, h2 — always green
       circle.style.borderColor = '#4ae176';
       circle.style.color       = '#4ae176';
       circle.style.boxShadow   = '0 0 15px rgba(74,225,118,0.2)';
-    } else {
-      circle.style.borderColor = 'rgba(69,70,77,0.3)';
-      circle.style.color       = '#dae2fd';
+    } else if (s.status === 'REROUTING' || s.status === 'NORMAL') { // s1, s2, s4 on active path
+      circle.style.borderColor = '#4ae176';
+      circle.style.color       = s.status === 'REROUTING' ? '#f59e0b' : '#4ae176';
+      circle.style.boxShadow   = s.status === 'REROUTING' ? '0 0 12px rgba(245,158,11,0.3)' : '0 0 15px rgba(74,225,118,0.15)';
+    } else { // CONGESTED — dim intermediate
+      circle.style.borderColor = 'rgba(69,70,77,0.5)';
+      circle.style.color       = '#64748b';
       circle.style.boxShadow   = 'none';
     }
   });
+
+  // Inject or update s3 alert badge next to path strip during congestion
+  let badge = document.getElementById('s3-alert-badge');
+  const pathContainer = document.querySelector('#page-dashboard .flex.items-center.justify-between.px-2.py-6');
+  if (pathContainer && !badge) {
+    // Inject once into the parent container
+    const wrapper = pathContainer.closest('div');
+    if (wrapper) {
+      badge = document.createElement('div');
+      badge.id = 's3-alert-badge';
+      badge.innerHTML = '<span class="material-symbols-outlined" style="font-size:12px">warning</span> s3 congested (eth2)';
+      wrapper.appendChild(badge);
+    }
+  }
+  if (badge) badge.classList.toggle('visible', isCongest);
 }
 
 /* ================================================================
-   4. TOPOLOGY UPDATER — SVG CSS variable injection
-      Does NOT touch coordinates or SVG structure
+   4. TOPOLOGY UPDATER — Class-based SVG state management
+      Reads from SDN_STATE only. Never creates its own state.
+      Controls [data-link] and [data-node] SVG elements via CSS classes.
+
+      VISUAL STATE MACHINE:
+        NORMAL    → primary path GREEN, s3 branch STANDBY
+        CONGESTED → primary path GREEN, s1–s3/s3–s4 RED + s3 RED
+        REROUTING → old-path (s1–s3/s3–s4) — GREY DASHED (fade out)
+                     new-path (h1–s1–s2–s4–h2) — GREEN (glowing)
+        NORMAL    → only new path visible, no red
    ================================================================ */
 function updateTopology() {
   const s = window.SDN_STATE;
-  const root = document.documentElement.style;
 
+  /* 4a. CSS variables for any legacy neon-pulse selectors */
+  const root = document.documentElement.style;
   if (s.status === 'CONGESTED') {
-    root.setProperty('--active-path-color', '#f59e0b');   // amber during congestion
+    root.setProperty('--active-path-color', '#eb4141');
     root.setProperty('--node-critical',     '#eb4141');
   } else if (s.status === 'REROUTING') {
-    root.setProperty('--active-path-color', '#f59e0b');
-    root.setProperty('--node-critical',     '#f59e0b');    // amber reroute glow
+    root.setProperty('--active-path-color', '#4ae176');
+    root.setProperty('--node-critical',     '#f59e0b');
   } else {
-    root.setProperty('--active-path-color', '#4ae176');   // restored green
+    root.setProperty('--active-path-color', '#4ae176');
     root.setProperty('--node-critical',     '#eb4141');
   }
 
-  /* --- Topology event log table: prepend a new row on state change --- */
+  /* 4b. Choose the class for nodes/links ON the active path */
+  const newPathClass  = s.status === 'REROUTING' ? 'rerouting' : 'active';
+  const oldPathClass  = 'old-path'; // grey dashed — only during REROUTING
+
+  // Primary forwarding path link IDs
+  const primaryLinks  = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
+  // Congested branch link IDs
+  const altLinks      = ['s1-s3', 's3-s4'];
+
+  /* 4c. Reset all links to standby */
+  document.querySelectorAll('#page-topology [data-link]').forEach(link => {
+    link.classList.remove('active', 'congested', 'standby', 'rerouting', 'old-path');
+    link.classList.add('standby');
+  });
+
+  /* 4d. Apply link states based on current SDN_STATE.status */
+  if (s.status === 'NORMAL') {
+    // Primary path: active (green)
+    primaryLinks.forEach(id => _setLinkClass(id, 'active'));
+    // Alternate branch: standby (grey)
+    altLinks.forEach(id => _setLinkClass(id, 'standby'));
+
+  } else if (s.status === 'CONGESTED') {
+    // Primary path: still active (green) — traffic still going through
+    primaryLinks.forEach(id => _setLinkClass(id, 'active'));
+    // Congested branch: RED pulsing
+    altLinks.forEach(id => _setLinkClass(id, 'congested'));
+
+  } else if (s.status === 'REROUTING') {
+    // Animated transition:
+    //   Step 1 (immediate): fade congested branch to old-path (grey dashed)
+    altLinks.forEach(id => _setLinkClass(id, 'old-path'));
+    //   Step 2 (after 500ms delay): light up new path green
+    primaryLinks.forEach(id => _setLinkClass(id, 'standby')); // brief standby first
+    setTimeout(() => {
+      primaryLinks.forEach(id => _setLinkClass(id, 'rerouting'));
+    }, 550);
+  }
+
+  /* 4e. Reset ALL nodes to standby */
+  document.querySelectorAll('#page-topology [data-node]').forEach(nodeG => {
+    const circle = nodeG.querySelector('circle');
+    const text   = nodeG.querySelector('text');
+    if (circle) { circle.classList.remove('active','congested','standby','rerouting'); circle.classList.add('standby'); }
+    if (text)   { text.classList.remove('active','congested','standby','rerouting');   text.classList.add('standby'); }
+  });
+
+  /* 4f. Apply node states */
+  const _activeNodeIds = _getNodesOnActivePath(primaryLinks);
+
+  if (s.status === 'NORMAL') {
+    _activeNodeIds.forEach(id => _setNodeClass(id, 'active'));
+
+  } else if (s.status === 'CONGESTED') {
+    _activeNodeIds.forEach(id => _setNodeClass(id, 'active'));
+    // s3 node — red
+    _setNodeClass('s3', 'congested');
+
+  } else if (s.status === 'REROUTING') {
+    // Instant: set s3 to standby (fade from red)
+    _setNodeClass('s3', 'standby');
+    // Immediate: grey out old intermediate nodes
+    _setNodeClass('s2', 'standby');
+    // After delay: light up full new path green
+    setTimeout(() => {
+      _activeNodeIds.forEach(id => _setNodeClass(id, 'rerouting'));
+    }, 550);
+  }
+
+  /* 4g. h1 and h2 are ALWAYS active (they are the hosts) */
+  if (s.status !== 'CONGESTED') { // during congestion keep them green too
+    setTimeout(() => {
+      ['h1','h2'].forEach(id => {
+        const nodeG = document.querySelector(`#page-topology [data-node="${id}"]`);
+        if (!nodeG) return;
+        const cls = s.status === 'REROUTING' ? 'rerouting' : 'active';
+        const circle = nodeG.querySelector('circle');
+        const text   = nodeG.querySelector('text');
+        if (circle) { circle.classList.remove('active','congested','standby','rerouting'); circle.classList.add(cls); }
+        if (text)   { text.classList.remove('active','congested','standby','rerouting');   text.classList.add(cls); }
+      });
+    }, s.status === 'REROUTING' ? 550 : 0);
+  } else {
+    ['h1','h2'].forEach(id => _setNodeClass(id, 'active'));
+  }
+
+  /* 4h. Topology event log entry on status change */
   const tbody = document.querySelector('#page-topology table tbody');
   if (tbody && s._lastTopoStatus !== s.status) {
     s._lastTopoStatus = s.status;
     const now = _ts();
     const msgs = {
-      CONGESTED: { type: 'Load Alert',   node: `${s.affectedSwitch.toUpperCase()}_NODE`, msg: `High buffer utilization on ${s.affectedSwitch}-eth2 (${s.load}%)`, badge: '<span class="badge-warning px-2 py-0.5 rounded text-[10px] font-bold">ACTIVE</span>' },
-      REROUTING: { type: 'Path Re-Route',node: 'CONTROLLER_01',                           msg: `Auto-reroute via path [${s.activePath.join('→')}] initiated`,       badge: '<span class="badge-rerouting px-2 py-0.5 rounded text-[10px] font-bold">IN PROGRESS</span>' },
-      NORMAL:    { type: 'Health Check', node: 'CONTROLLER_01',                           msg: 'All nodes operational. Flow latency within bounds.',                 badge: '<span class="badge-active px-2 py-0.5 rounded text-[10px] font-bold">STABLE</span>' },
+      CONGESTED: { type: 'Load Alert',    node: 'S3',             msg: `Congestion on s3 port eth2 (${s.load.toFixed(0)}% utilization). Path degraded.`, badge: '<span class="badge-warning px-2 py-0.5 rounded text-[10px] font-bold">ACTIVE</span>' },
+      REROUTING: { type: 'Path Re-Route', node: 'CONTROLLER',     msg: `Rerouting: [h1→s1→s3→s4→h2] → [h1→s1→s2→s4→h2]. s2 path active.`, badge: '<span class="badge-rerouting px-2 py-0.5 rounded text-[10px] font-bold">IN PROGRESS</span>' },
+      NORMAL:    { type: 'Health Check',  node: 'CONTROLLER',     msg: 'All nodes operational. Path h1→s1→s2→s4→h2 stable. Latency within bounds.', badge: '<span class="badge-active px-2 py-0.5 rounded text-[10px] font-bold">STABLE</span>' },
     };
     const m = msgs[s.status] || msgs.NORMAL;
     const tr = document.createElement('tr');
@@ -175,6 +301,52 @@ function updateTopology() {
     tbody.insertBefore(tr, tbody.firstChild);
     while (tbody.children.length > 6) tbody.removeChild(tbody.lastChild);
   }
+}
+
+/* Set link class helper — finds the element and swaps class */
+function _setLinkClass(linkId, cls) {
+  const el = document.querySelector(`#page-topology [data-link="${linkId}"]`);
+  if (!el) return;
+  el.classList.remove('active','congested','standby','rerouting','old-path');
+  el.classList.add(cls);
+}
+
+/* Set node class helper — applies to circle + text inside [data-node] */
+function _setNodeClass(nodeId, cls) {
+  const nodeG = document.querySelector(`#page-topology [data-node="${nodeId}"]`);
+  if (!nodeG) return;
+  const circle = nodeG.querySelector('circle');
+  const text   = nodeG.querySelector('text');
+  if (circle) { circle.classList.remove('active','congested','standby','rerouting'); circle.classList.add(cls); }
+  if (text)   { text.classList.remove('active','congested','standby','rerouting');   text.classList.add(cls); }
+}
+
+/* Helper: returns the set of data-node IDs implicitly touched by a set of link IDs */
+function _getNodesOnActivePath(linkIds) {
+  const nodeSet = new Set();
+  // link format: "nodeA-nodeB" (case-insensitive match to data-node attributes)
+  linkIds.forEach(linkId => {
+    // split on first capital letter boundary or hyphen
+    const parts = linkId.split('-');
+    // edge01-coreA  => ['edge01', 'coreA'] => ['edge01', 'core_a']
+    if (parts.length >= 2) {
+      const a = _normNodeId(parts[0]);
+      const b = _normNodeId(parts.slice(1).join('-'));
+      if (a) nodeSet.add(a);
+      if (b) nodeSet.add(b);
+    }
+  });
+  return nodeSet;
+}
+
+/* Normalize link segment string to data-node attribute value.
+   With real Mininet naming these are already canonical — pass through. */
+function _normNodeId(seg) {
+  const map = {
+    'h1': 'h1', 'h2': 'h2',
+    's1': 's1', 's2': 's2', 's3': 's3', 's4': 's4',
+  };
+  return map[seg.toLowerCase()] || null;
 }
 
 /* ================================================================
@@ -198,16 +370,16 @@ function updateOptimization() {
   if (reasonEl) {
     const reasons = {
       NORMAL:    `System stable. No rerouting required. Latency at ${s.latency.toFixed(1)}ms.`,
-      CONGESTED: `High load on ${s.affectedSwitch}-eth2 exceeds threshold (${s.load}%). Rerouting advised.`,
-      REROUTING: `Active reroute via path [${s.activePath.join('→')}] from ${s.affectedSwitch} congestion.`,
+      CONGESTED: `High load detected on switch s3 port eth2 (${s.load.toFixed(0)}% utilization). Rerouting advised.`,
+      REROUTING: `Rerouted traffic from [h1,s1,s3,s4,h2] to [h1,s1,s2,s4,h2]. Evaluating stability.`,
     };
     reasonEl.textContent = reasons[s.status] || reasons.NORMAL;
   }
   if (actionEl) {
     const actions = {
-      NORMAL:    'No action needed. Monitoring all flows.',
-      CONGESTED: `Scheduling reroute for flows on ${s.affectedSwitch}. Evaluating alternate path.`,
-      REROUTING: `Re-balancing flow #${8820 + s.rerouteCount} via backup links [${s.activePath.join('→')}].`,
+      NORMAL:    'Monitoring all flows on h1→s1→s2→s4→h2. No action required.',
+      CONGESTED: `Evaluating alternate paths. Switch s3 congested (${s.load.toFixed(0)}%). Switching to s2 path.`,
+      REROUTING: `Active path: [h1→s1→s2→s4→h2]. s3 isolated. Flow table updated on controller.`,
     };
     actionEl.textContent = actions[s.status] || actions.NORMAL;
   }
@@ -271,15 +443,15 @@ function updateSecurity() {
     if (s.congestion) {
       anomalyPanel.style.background = '#390003';
       if (title) title.style.color  = '#eb4141';
-      if (desc)  desc.textContent   = `Traffic spike detected at ${s.affectedSwitch.toUpperCase()}. Rerouting triggered. Monitoring for DDoS vector.`;
+      if (desc)  desc.textContent   = `Traffic spike detected at switch ${s.affectedSwitch}. Congestion: ${s.load.toFixed(0)}%. Rerouting triggered. Monitoring for DDoS vector.`;
     } else if (s.rerouting) {
       anomalyPanel.style.background = 'rgba(120,77,4,0.5)';
       if (title) title.style.color  = '#f59e0b';
-      if (desc)  desc.textContent   = `Rerouting active via path [${s.activePath.join('→')}]. Security posture stable.`;
+      if (desc)  desc.textContent   = `Rerouting active via [${s.activePath.join('→')}]. Traffic moved from s3 to s2 path. Security posture stable.`;
     } else {
       anomalyPanel.style.background = 'rgba(57,0,3,0.15)';
       if (title) title.style.color  = '#eb4141';
-      if (desc)  desc.textContent   = 'No active anomalies detected. All baseline patterns within normal range.';
+      if (desc)  desc.textContent   = 'No active anomalies detected. Path h1→s1→s2→s4→h2 stable. All baseline patterns within normal range.';
     }
   }
 
@@ -293,9 +465,9 @@ function _appendSecurityLog() {
   if (!container) return;
 
   const msgs = {
-    CONGESTED: { badge: 'badge-critical', label: '[CRITICAL]', color: '#eb4141', text: `Traffic burst on ${s.affectedSwitch.toUpperCase()}: ${s.load}% utilization` },
-    REROUTING: { badge: 'badge-rerouting', label: '[EXEC]',    color: '#f59e0b', text: `Rerouting via [${s.activePath.join('→')}]. Security monitoring active.` },
-    NORMAL:    { badge: 'badge-active',   label: '[INFO]',     color: '#4ae176', text: 'Baseline stable. No anomalies detected this cycle.' },
+    CONGESTED: { badge: 'badge-critical', label: '[CRITICAL]', color: '#eb4141', text: `Congestion detected at switch ${s.affectedSwitch} port eth2: ${s.load.toFixed(0)}% utilization.` },
+    REROUTING: { badge: 'badge-rerouting', label: '[EXEC]',    color: '#f59e0b', text: `Rerouting via [${s.activePath.join('→')}]. s3 isolated. Security monitoring active.` },
+    NORMAL:    { badge: 'badge-active',   label: '[INFO]',     color: '#4ae176', text: 'Monitoring traffic on h1→s1→s2→s4→h2. Baseline stable.' },
   };
   const m = msgs[s.status] || msgs.NORMAL;
 
@@ -386,9 +558,9 @@ function _appendHardwareLog() {
   const container = document.querySelector('#page-hardware .overflow-y-auto.font-mono');
   if (!container) return;
   const msgs = {
-    CONGESTED: { color: '#eb4141', level: 'ALERT:',   text: `Buffer overflow on ${s.affectedSwitch}-eth2 (${s.load}% load). CRC errors rising.` },
-    REROUTING: { color: '#f59e0b', level: 'EXEC:',    text: `Port re-assignment active on ${s.affectedSwitch}. Monitoring link stability.` },
-    NORMAL:    { color: '#60a5fa', level: 'INFO:',    text: `All switch interfaces operating within normal parameters. Load: ${s.load}%.` },
+    CONGESTED: { color: '#eb4141', level: 'ALERT:', text: `[WARN] Congestion at switch ${s.affectedSwitch} port eth2 (${s.load.toFixed(0)}% load). CRC errors rising.` },
+    REROUTING: { color: '#f59e0b', level: 'EXEC:',  text: `[EXEC] Rerouting via s2. Flow table updated on s1. s3 isolated from active path.` },
+    NORMAL:    { color: '#60a5fa', level: 'INFO:',  text: `[INFO] Monitoring traffic on h1→s1→s2→s4→h2. Load: ${s.load.toFixed(0)}%.` },
   };
   const m = msgs[s.status] || msgs.NORMAL;
   const p = document.createElement('p');
@@ -440,33 +612,34 @@ function simulateNetworkFlow() {
   clearTimeout(_simTimeout1); clearTimeout(_simTimeout2); clearTimeout(_simTimeout3);
 
   // 0 → 3s: Congestion phase
-  _systemLog('WARN',    `Traffic anomaly detected on ${s.affectedSwitch}-eth2. Buffer at ${s.load}%.`);
+  _systemLog('WARN',    `[INFO] Monitoring traffic on h1→s1→s2→s4→h2. Anomaly detected on ${s.affectedSwitch}-eth2. Buffer at ${s.load}%.`);
   _simTimeout1 = setTimeout(() => {
     s.status          = 'CONGESTED';
     s.congestion      = true;
     s.load            = 87;
     s.latency         = 38.4;
     s.confidence      = 91.2;
+    s.congestedNode   = window.NODE_MAP[s.affectedSwitch] || null; // 'core_b'
     s._graphHistory.push(91);
     s._graphHistory.shift();
     updateUI();
-    _systemLog('WARN',  `CONGESTED: Switch ${s.affectedSwitch.toUpperCase()} load at ${s.load}%. Latency spike ${s.latency}ms.`);
-    _systemLog('ERROR', `Packet loss threshold exceeded on ${s.affectedSwitch}-eth3. Triggering reroute decision.`);
+    _systemLog('WARN',  `[WARN] Congestion detected at ${s.affectedSwitch} port eth2 — buffer at ${s.load}%, latency spike ${s.latency}ms.`);
+    _systemLog('ERROR', `[INFO] Evaluating alternate paths. Primary path h1→s1→s3→s4→h2 degraded.`);
   }, 3000);
 
   // 3 → 6s: Rerouting phase
   _simTimeout2 = setTimeout(() => {
     s.status          = 'REROUTING';
     s.rerouting       = true;
-    s.activePath      = [1, 2, 4];
-    s.oldPath         = [1, 3, 4];
+    s.activePath      = ['h1-s1', 's1-s2', 's2-s4', 's4-h2'];
+    s.oldPath         = ['h1-s1', 's1-s3', 's3-s4', 's4-h2'];
     s.latency         = 18.2;
     s.confidence      = 96.7;
     s.rerouteCount   += 1;
     s._graphHistory.push(55);
     s._graphHistory.shift();
     updateUI();
-    _systemLog('EXEC',  `Rerouting path [${s.activePath.join('→')}] deployed. Old path [${s.oldPath.join('→')}] deprecated.`);
+    _systemLog('EXEC',  '[EXEC] Rerouting via s2. Path [h1→s1→s2→s4→h2] deployed. Old path [h1→s1→s3→s4→h2] deprecated.');
   }, 6000);
 
   // 6 → 9s: Normal restored
@@ -474,6 +647,7 @@ function simulateNetworkFlow() {
     s.status          = 'NORMAL';
     s.congestion      = false;
     s.rerouting       = false;
+    s.congestedNode   = null;
     s.load            = 24;
     s.latency         = 4.2;
     s.confidence      = 98.4 + Math.random() * 1.4;
@@ -481,7 +655,7 @@ function simulateNetworkFlow() {
     s._graphHistory.shift();
     s._simRunning     = false;
     updateUI();
-    _systemLog('SUCCESS', `System restored. Path [${s.activePath.join('→')}] stable. Latency: ${s.latency}ms.`);
+    _systemLog('SUCCESS', '[SUCCESS] Traffic stabilized. Path [h1\u2192s1\u2192s2\u2192s4\u2192h2] active. Latency: ' + s.latency.toFixed(1) + 'ms.');
   }, 9000);
 }
 
@@ -542,27 +716,29 @@ function simulateNetworkFlow() {
 function triggerCongestion() {
   const s = window.SDN_STATE;
   if (s._simRunning) { clearTimeout(_simTimeout1); clearTimeout(_simTimeout2); clearTimeout(_simTimeout3); s._simRunning = false; }
-  s.status      = 'CONGESTED';
-  s.congestion  = true;
-  s.rerouting   = false;
-  s.load        = 87;
-  s.latency     = 38.4;
-  s.confidence  = 91.2;
+  s.status        = 'CONGESTED';
+  s.congestion    = true;
+  s.rerouting     = false;
+  s.load          = 87;
+  s.latency       = 38.4;
+  s.confidence    = 91.2;
+  s.congestedNode = window.NODE_MAP[s.affectedSwitch] || null; // 'core_b'
   updateUI();
-  _systemLog('WARN',  `Manual trigger: CONGESTED state on ${s.affectedSwitch.toUpperCase()}. Load at ${s.load}%.`);
+  _systemLog('WARN',  `Manual trigger: CONGESTED state on ${s.affectedSwitch.toUpperCase()} (${s.congestedNode}). Load at ${s.load}%.`);
   _systemLog('ERROR', 'Packet drop rate elevated. Controller evaluating reroute options.');
 }
 
 function resetNormal() {
   clearTimeout(_simTimeout1); clearTimeout(_simTimeout2); clearTimeout(_simTimeout3);
   const s = window.SDN_STATE;
-  s.status      = 'NORMAL';
-  s.congestion  = false;
-  s.rerouting   = false;
-  s.load        = 24;
-  s.latency     = 4.2;
-  s.confidence  = 98.4;
-  s._simRunning = false;
+  s.status        = 'NORMAL';
+  s.congestion    = false;
+  s.rerouting     = false;
+  s.congestedNode = null;
+  s.load          = 24;
+  s.latency       = 4.2;
+  s.confidence    = 98.4;
+  s._simRunning   = false;
   updateUI();
   _systemLog('SUCCESS', 'Manual reset: All systems restored to NORMAL state.');
 }
